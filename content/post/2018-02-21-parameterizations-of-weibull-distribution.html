@@ -1,0 +1,128 @@
+---
+title: Parameterizations of Weibull Distribution
+author: 'Yunwei Hu'
+date: '2017-11-09'
+slug: parameterizations-of-weibull-distribution
+categories:
+  - Reliability
+tags:
+  - Weibull
+---
+
+
+
+<div id="most-widely-used-distribution-in-reliability-engineering" class="section level1">
+<h1>Most Widely Used Distribution in Reliability Engineering</h1>
+<p>Weibull distribution is widely used because its flexibility and simplicity. It is the most widely used in the field of reliability engineering. Engineers use Weibull plot to find clues about whether the failure is infant mortality or wearing out, or use the curve shape to determine whether there are more than one underlying failure mechanisms. Actually, there are several software companies selling software packages named after the <a href="https://en.wikipedia.org/wiki/Waloddi_Weibull">Swedish Engineer</a>.</p>
+</div>
+<div id="parameterizations" class="section level1">
+<h1>Parameterizations</h1>
+<p>When I mentioned the simplicity of Weibull distribution, I was referring to that it has only two paraments, and both of them have significannt engineering interprations.</p>
+<div id="shape-and-scale" class="section level2">
+<h2>Shape and Scale</h2>
+<p>One of the most popular Reliability Engineering software package is Weibull++ (r) made by Reliasoft. The company also maintains the website [www.weibull.com]. It provides wealth of information of reliability engineering, and especially, Weibull distribution and its applications. In their implentation, the Weibull distribution has a characteristic life parameter <span class="math inline">\(\eta\)</span> and a shape factor <span class="math inline">\(\beta\)</span>, and the hazard function is <span class="math display">\[ h \left( t \right) = \frac{\beta} {\eta} \left( \frac{t}{\eta}\right)^\beta\]</span></p>
+<ul>
+<li>where <span class="math inline">\(\eta\)</span> is the scale parameter, or characteristic life</li>
+<li>and <span class="math inline">\(\beta\)</span> is the shape parameter (or slope) The reliability function is thus <span class="math display">\[ R \left( t \right) = e^ {- \left( \frac{t}{\eta} \right) ^ \beta} \]</span></li>
+</ul>
+<p>It is easy to see: * when <span class="math inline">\(\beta = 1\)</span>, the h(t) is a flat line, a constant; * when <span class="math inline">\(\beta &gt; 1\)</span>, the h(t) is monotonously increasing over time; * when <span class="math inline">\(\beta &lt; 1\)</span>, the h(t) is monotonously increasing over time; * While <span class="math inline">\(\beta\)</span> determines the shaple of curve, the <span class="math inline">\(\eta\)</span> determines the scale. * <span class="math inline">\(\eta\)</span> is the time that no matter what <span class="math inline">\(\beta\)</span> is, $R ( t ) = e^{-1} = 63%, thus the name charasteristic life.</p>
+<p>Through my graduate schools, we used same parameterization in the textbooks ( <a href="https://www.amazon.com/Applied-Life-Analysis-Wayne-Nelson/dp/0471644625">Nelson</a> and <a href="https://www.amazon.com/Reliability-Engineering-Risk-Analysis-Practical/dp/0849392470">Modarres</a>), except that <span class="math inline">\(\alpha\)</span> took the place of <span class="math inline">\(\eta\)</span>. Give it a few year, I adjusted.</p>
+<p>You can hear debate about <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\eta\)</span> of a component around my office. Engineers love this simplicity.</p>
+<p>Until there is none.</p>
+</div>
+</div>
+<div id="confusion" class="section level1">
+<h1>Confusion</h1>
+<div id="most-popular-stastical-software" class="section level2">
+<h2>Most Popular Stastical Software</h2>
+<p>There is no denial that the by far most widely used statistical software is Excel, even though a unreliable one. Let’s look at the Weibull distribution implemented in <a href="https://support.office.com/en-us/article/WEIBULL-function-b83dc2c6-260b-4754-bef2-633196f6fdcc">Excel:</a></p>
+<blockquote>
+<p>WEIBULL(x,alpha,beta,cumulative)</p>
+<p>The WEIBULL function syntax has the following arguments:</p>
+<p>X Required. The value at which to evaluate the function.</p>
+<p>Alpha, Beta Required, parameters to the distribution.</p>
+<p>Cumulative Required. Determines the form of the function, if True, returns CDP, if false, pdf..</p>
+</blockquote>
+<p>The equation for the Weibull cumulative distribution function is: <span class="math display">\[ F\left( t; \alpha, \beta \right) = 1 - e^ {- \left( \frac{t}{\beta} \right) ^ \alpha}\]</span></p>
+<p>Well, it not too bad, just my world upside down. <span class="math inline">\(\alpha\)</span> is <span class="math inline">\(\beta\)</span>, and <span class="math inline">\(\beta\)</span> is <span class="math inline">\(\alpha\)</span>. In excel, <span class="math inline">\(\beta\)</span> is scale, and <span class="math inline">\(\alpha\)</span> is shape.</p>
+<p>Also, important to note that in Excel function call, only order matters, and you cannot force call by argument as in R.</p>
+</div>
+<div id="the-upstart" class="section level2">
+<h2>The Upstart</h2>
+<p>Welcome to R, the favorite kid on the block.</p>
+<pre><code>The Weibull distribution with shape parameter a and scale parameter b has density given by
+f(x) = (a/b) (x/b)^(a-1) exp(- (x/b)^a)
+for x &gt; 0. The cumulative distribution function is F(x) = 1 - exp(- (x/b)^a) on x &gt; 0</code></pre>
+<p>So, a is shape, or <span class="math inline">\(\alpha\)</span>, b is scale, or <span class="math inline">\(\beta\)</span>, as in Excel, not Nelson. When calling function with argument, as most do in R, it is less confusing.</p>
+<p>Shape = 1 means constant as in most implementations, and scale is the characteristic life.</p>
+<pre class="r"><code>t &lt;- 0:1000
+plot(t, pweibull(t, shape = 1, scale = 500))</code></pre>
+<p><img src="/post/2018-02-21-parameterizations-of-weibull-distribution_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+</div>
+<div id="jmp" class="section level2">
+<h2>JMP</h2>
+<p>I love JMP. Not the software, I have not used for long enough to form an opinion. I love the <a href="http://www.jmp.com/support/help/Survival_Platform_Options.shtml#221381">help</a>.</p>
+<p>Various Weibull Parameters in Terms of JMP’s alpha and beta</p>
+<table>
+<thead>
+<tr class="header">
+<th>JMP Weibull</th>
+<th>alpha</th>
+<th>beta</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Wayne Nelson</td>
+<td>alpha=alpha</td>
+<td>beta=beta</td>
+</tr>
+<tr class="even">
+<td>Meeker and Escobar</td>
+<td>eta=alpha</td>
+<td>beta=beta</td>
+</tr>
+<tr class="odd">
+<td>Tobias and Trindade</td>
+<td>c = alpha</td>
+<td>m = beta</td>
+</tr>
+<tr class="even">
+<td>Kececioglu</td>
+<td>eta=alpha</td>
+<td>beta=beta</td>
+</tr>
+<tr class="odd">
+<td>Hosmer and Lemeshow</td>
+<td>exp(X beta)=alpha</td>
+<td>lambda=beta</td>
+</tr>
+<tr class="even">
+<td>Blishke and Murthy</td>
+<td>beta=alpha</td>
+<td>alpha=beta</td>
+</tr>
+<tr class="odd">
+<td>Kalbfleisch and Prentice</td>
+<td>lambda = 1/alpha</td>
+<td>p = beta</td>
+</tr>
+<tr class="even">
+<td>JMP Extreme Value</td>
+<td>lambda=log(alpha)</td>
+<td>delta=1/beta</td>
+</tr>
+<tr class="odd">
+<td>Meeker and Escobar s.e.v.</td>
+<td>mu=log(alpha)</td>
+<td>sigma=1/beta</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="final-thoughts" class="section level2">
+<h2>Final Thoughts</h2>
+<p>Weibull distribution is used widely in engineering, biostatistics and other areas. The paramenterization has many ways. The most common used in engineering is the convention used in Nelson or Meeker. The shape factor is the characteristic life, called <span class="math inline">\(\alpha\)</span> or <span class="math inline">\(\eta\)</span>, and shape factor <span class="math inline">\(\beta\)</span>. Even though in R help file, a is used for shape factor, and b for scale, when people call by argument, it is fairly straight forward.</p>
+<p>However, Excel’s implementation is the poorest. The prompt for the equation gives <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> without mention which is shape or sacle factor, while they use it he opposite way as most other software package. To make things worse, the help file only gives equations and not the terminology shape or scale factor. It is not hard to imagine …</p>
+</div>
+</div>
