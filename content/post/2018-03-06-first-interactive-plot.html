@@ -14,15 +14,16 @@ tags:
 
 <div id="interactive-plot-in-blogdown" class="section level2">
 <h2>Interactive Plot in Blogdown</h2>
-<p>Blogdown is to generate static HTML, according a <a href="https://github.com/rstudio/blogdown/issues/166">github answer</a> by the <a href="https://github.com/yihui">author of Blogdwon</a> himself, the only way to embed a interactive Shiny app is to use <code>&lt;iframe&gt;</code>.</p>
+<p>Blogdown is to generate static HTML, and according a <a href="https://github.com/rstudio/blogdown/issues/166">github answer</a> by the <a href="https://github.com/yihui">author of Blogdwon</a> himself, the only way to embed a interactive Shiny app is to use <code>&lt;iframe&gt;</code>.</p>
 </div>
 <div id="create-a-shiny-app-and-deploy-it" class="section level2">
 <h2>Create a Shiny app and deploy it</h2>
-<p>The easiest to deploy a Shiny app is to use the <a href="www.shinyapps.io">shinyapps.io</a> platform. Just follow the steps from the website after you sign up, and you shiny app is deployed, in 3 steps. My first attemp is at <a href="https://riskpredictions.shinyapps.io/prob_plot/" class="uri">https://riskpredictions.shinyapps.io/prob_plot/</a></p>
+<p>The easiest way to deploy a Shiny app is to use the <a href="www.shinyapps.io">shinyapps.io</a> platform. Just follow the steps from the website after you sign up, and you shiny app is deployed, in 3 steps. My first attemp is at <a href="https://riskpredictions.shinyapps.io/prob_plot/" class="uri">https://riskpredictions.shinyapps.io/prob_plot/</a></p>
 </div>
 <div id="create-an-iframe-block-in-blogdown" class="section level2">
 <h2>Create an iframe block in Blogdown</h2>
 <p>Follow the steps at <a href="https://rmarkdown.rstudio.com/authoring_shiny.html" class="uri">https://rmarkdown.rstudio.com/authoring_shiny.html</a></p>
+<p>Add the code below to the end of the Rmarkdown post.</p>
 <p><code>&lt;iframe src = &quot;https://riskpredictions.shinyapps.io/prob_plot/&quot; frameborder=&quot;0&quot; allowfullscreen width = 800 height = 800&gt; &lt;/iframe&gt;</code></p>
 <p>Here it comes:</p>
 <iframe src="https://riskpredictions.shinyapps.io/prob_plot/" frameborder="0" allowfullscreen width="800" height="800">
