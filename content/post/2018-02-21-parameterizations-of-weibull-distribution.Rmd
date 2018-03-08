@@ -26,13 +26,14 @@ The reliability function is thus $$ R \left( t \right) = e^ {- \left( \frac{t}{\
 
 
 It is easy to see:
+
 * when $\beta = 1$, the h(t) is a flat line, a constant;
 * when $\beta > 1$, the h(t) is monotonously increasing over time;
 * when $\beta < 1$, the h(t) is monotonously increasing over time;
 * While $\beta$ determines the shaple of curve, the $\eta$ determines the scale. 
-* $\eta$ is the time that no matter what $\beta$ is, $R \left( t \right) = e^{-1} = 63%, thus the name charasteristic life. 
+* $\eta$ is the time that no matter what $\beta$ is, $R \left( t \right) = e^{-1} = 63\%$, thus the name charasteristic life. 
 
-Through my graduate schools, we used same parameterization in the textbooks ( [Nelson](https://www.amazon.com/Applied-Life-Analysis-Wayne-Nelson/dp/0471644625) and [Modarres](https://www.amazon.com/Reliability-Engineering-Risk-Analysis-Practical/dp/0849392470)), except that $\alpha$ took the place of $\eta$. Give it a few year, I adjusted. 
+Through my graduate schools, we used same parameterization in the textbooks ( [Nelson](https://www.amazon.com/Applied-Life-Analysis-Wayne-Nelson/dp/0471644625) and [Modarres](https://www.amazon.com/Reliability-Engineering-Risk-Analysis-Practical/dp/0849392470)), except that $\alpha$ took the place of $\eta$. Give it a few years, I adjusted. 
 
 You can hear debate about $\beta$ and $\eta$ of a component around my office. Engineers love this simplicity. 
 
@@ -103,4 +104,4 @@ Meeker and Escobar s.e.v.|mu=log(alpha)|sigma=1/beta
 Weibull distribution is used widely in engineering, biostatistics and other areas. The paramenterization has many ways. The most common used in engineering is the convention used in Nelson or Meeker. The shape factor is the characteristic life, called $\alpha$ or $\eta$, and shape factor $\beta$. 
 Even though in R help file, a is used for shape factor, and b for scale, when people call by argument, it is fairly straight forward.
 
-However, Excel's implementation is the poorest. The prompt for the equation gives $\alpha$ and $\beta$ without mention which is shape or sacle factor, while they use it he opposite way as most other software package. To make things worse, the help file only gives equations and not the terminology shape or scale factor. It is not hard to imagine ...
+However, Excel's implementation is the poorest. The prompt for the equation gives $\alpha$ and $\beta$ without mention which is shape or sacle factor, while they use it he opposite way as most other software package. To make things worse, the help file only gives equations and not the terminology shape or scale factor. It is not hard to imagine that mistakes embeded in some important spreadsheet that are used to make critical decision. After all, Excel is *the most* popular statistical software, especially in business world, which is *the* world that matters :)

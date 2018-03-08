@@ -25,8 +25,15 @@ tags:
 <li>where <span class="math inline">\(\eta\)</span> is the scale parameter, or characteristic life</li>
 <li>and <span class="math inline">\(\beta\)</span> is the shape parameter (or slope) The reliability function is thus <span class="math display">\[ R \left( t \right) = e^ {- \left( \frac{t}{\eta} \right) ^ \beta} \]</span></li>
 </ul>
-<p>It is easy to see: * when <span class="math inline">\(\beta = 1\)</span>, the h(t) is a flat line, a constant; * when <span class="math inline">\(\beta &gt; 1\)</span>, the h(t) is monotonously increasing over time; * when <span class="math inline">\(\beta &lt; 1\)</span>, the h(t) is monotonously increasing over time; * While <span class="math inline">\(\beta\)</span> determines the shaple of curve, the <span class="math inline">\(\eta\)</span> determines the scale. * <span class="math inline">\(\eta\)</span> is the time that no matter what <span class="math inline">\(\beta\)</span> is, $R ( t ) = e^{-1} = 63%, thus the name charasteristic life.</p>
-<p>Through my graduate schools, we used same parameterization in the textbooks ( <a href="https://www.amazon.com/Applied-Life-Analysis-Wayne-Nelson/dp/0471644625">Nelson</a> and <a href="https://www.amazon.com/Reliability-Engineering-Risk-Analysis-Practical/dp/0849392470">Modarres</a>), except that <span class="math inline">\(\alpha\)</span> took the place of <span class="math inline">\(\eta\)</span>. Give it a few year, I adjusted.</p>
+<p>It is easy to see:</p>
+<ul>
+<li>when <span class="math inline">\(\beta = 1\)</span>, the h(t) is a flat line, a constant;</li>
+<li>when <span class="math inline">\(\beta &gt; 1\)</span>, the h(t) is monotonously increasing over time;</li>
+<li>when <span class="math inline">\(\beta &lt; 1\)</span>, the h(t) is monotonously increasing over time;</li>
+<li>While <span class="math inline">\(\beta\)</span> determines the shaple of curve, the <span class="math inline">\(\eta\)</span> determines the scale.</li>
+<li><span class="math inline">\(\eta\)</span> is the time that no matter what <span class="math inline">\(\beta\)</span> is, <span class="math inline">\(R \left( t \right) = e^{-1} = 63\%\)</span>, thus the name charasteristic life.</li>
+</ul>
+<p>Through my graduate schools, we used same parameterization in the textbooks ( <a href="https://www.amazon.com/Applied-Life-Analysis-Wayne-Nelson/dp/0471644625">Nelson</a> and <a href="https://www.amazon.com/Reliability-Engineering-Risk-Analysis-Practical/dp/0849392470">Modarres</a>), except that <span class="math inline">\(\alpha\)</span> took the place of <span class="math inline">\(\eta\)</span>. Give it a few years, I adjusted.</p>
 <p>You can hear debate about <span class="math inline">\(\beta\)</span> and <span class="math inline">\(\eta\)</span> of a component around my office. Engineers love this simplicity.</p>
 <p>Until there is none.</p>
 </div>
@@ -123,6 +130,6 @@ plot(t, pweibull(t, shape = 1, scale = 500))</code></pre>
 <div id="final-thoughts" class="section level2">
 <h2>Final Thoughts</h2>
 <p>Weibull distribution is used widely in engineering, biostatistics and other areas. The paramenterization has many ways. The most common used in engineering is the convention used in Nelson or Meeker. The shape factor is the characteristic life, called <span class="math inline">\(\alpha\)</span> or <span class="math inline">\(\eta\)</span>, and shape factor <span class="math inline">\(\beta\)</span>. Even though in R help file, a is used for shape factor, and b for scale, when people call by argument, it is fairly straight forward.</p>
-<p>However, Excel’s implementation is the poorest. The prompt for the equation gives <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> without mention which is shape or sacle factor, while they use it he opposite way as most other software package. To make things worse, the help file only gives equations and not the terminology shape or scale factor. It is not hard to imagine …</p>
+<p>However, Excel’s implementation is the poorest. The prompt for the equation gives <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(\beta\)</span> without mention which is shape or sacle factor, while they use it he opposite way as most other software package. To make things worse, the help file only gives equations and not the terminology shape or scale factor. It is not hard to imagine that mistakes embeded in some important spreadsheet that are used to make critical decision. After all, Excel is <em>the most</em> popular statistical software, especially in business world, which is <em>the</em> world that matters :)</p>
 </div>
 </div>
