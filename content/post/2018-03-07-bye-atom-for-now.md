@@ -10,14 +10,14 @@ I have heard a lot of good things about [Atom](https://github.com/atom) from Git
 
 My need is simple, R and Python coding for data analysis and some manipulation of text files as needed. Markdown is my latest favorite for writing notes to myself.
 
-Atom is powerful, but not a lightweight as Notepad++, so it is always slower to start up and more difficult for me to go through the menus. The last straw came yesterday, when I tried to manipuate some csv files. 
+Atom is powerful, but not a lightweight as Notepad++, so it is always slower to start up and more difficult, for me, to go through the menus. The last straw came yesterday, when I worked with some csv files. 
 Notepad++ outperformed Atom. 
 
-- Notepad++ autodect the encoding as UTF-16-LE, and Atom failed to do so. 
-- To save the file as UTF-8, Atom has nice package to do so, and Notepad++ need a CRTL+A and copy paste. 
+- Notepad++ autodected the encoding as UTF-16-LE, and Atom failed to do so. 
+- To save the file as UTF-8, Atom has nice package to do so, and Notepad++ needs a CRTL+A and copy paste. 
 - Atom totally failed when I tried to open a larger csv (200M). It just crashed. Notepad++ not only opened file fairly quickly, and it did not sweat during CRTL+A and copy paste routuine. 
 
-For my user case, I will use Rstudio + Spyder/Jupyter for coding, and Notepad++ for text file manipulations. Do not really see a niche for Atom to shine, for now. 
+For my user case, I will use Rstudio + Spyder/Jupyter for coding, and Notepad++ for occasional text editing. Do not really see a niche for Atom to shine, for now. 
 
 See you, I barely know you, Atom. Hope we will meet again soon!
 
