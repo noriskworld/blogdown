@@ -25,19 +25,11 @@ There it is, non-breaking space vs. regular space.
 Use the regex in Atom to replace all `\xa0' did the trick. It is a JSON now!
 
 The topic was [discussed](https://github.com/mikechambers/as3corelib/issues/110) before, the acceptable white spaces in JSON include:
-<<<<<<< HEAD
+
 > ws = *( </br>
 %x20 / ; Space </br>
 %x09 / ; Horizontal tab </br>
 %x0A / ; Line feed or New line </br>
 %x0D ; Carriage return </br>
-=======
-> ws = *(
-%x20 / ; Space
-%x09 / ; Horizontal tab
-%x0A / ; Line feed or New line
-%x0D ; Carriage return
->>>>>>> 4fdf5b98f71d543d442e11f322750c5d6a1ff941
-)
 
 Hours not well spent ...
