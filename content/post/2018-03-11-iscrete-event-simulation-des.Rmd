@@ -22,10 +22,12 @@ The objective to develop some Python DES tools for simple series/parallel system
 
 ## The GRP Model for Parametric Recurrent Event Data Analysis
 We follow the convention in [Ref 1] (http://www.weibull.com/hotwire/issue59/relbasics59.htm). (Fix typo in type II eq.)
+
 > In this model, the concept of virtual age is introduced. Denote by t1,t2,...,tn the successive failure times and let x1,x2,...,x3 represent the time between failures. Assume that after each event, actions are taken to improve the system performance. Let q be the action effectiveness factor. There are two GRP models. </br>
 - Type I:  $v_i = v_{i-1} + q \cdot x_i = q \cdot t_i$
 - Type II: $v_i = q \cdot (v_{i-1} +  x_i )= \sum_{k=1}^i q^{i-k+1} \cdot x_k$</br>
-where $v_i$ is the virtual age of the system right after the ith repair. The Type I model assumes that the ith repair cannot remove the damage incurred before the $i^th$ failure. It can only reduce the additional age $x_i$ to $q \cdot x_i$. The Type II model assumes that at the $i^th$ repair, the virtual age has been accumulated to $v_{i-1} + x_i$. The $i^th$ repair will remove the cumulative damage from both current and previous failures by reducing the virtual age to $q \cdot (v_{i-1} + x_i )$.
+where $v_i$ is the virtual age of the system right after the ith repair. The Type I model assumes that the $i^{th} repair cannot remove the damage incurred before the $i^{th}$ failure. It can only reduce the additional age $x_i$ to $q \cdot x_i$. The Type II model assumes that at the $i^{th}$ repair, the virtual age has been accumulated to $v_{i-1} + x_i$. The $i^{th}$ repair will remove the cumulative damage from both current and previous failures by reducing the virtual age to $q \cdot (v_{i-1} + x_i )$.
+
 
 ## Analytical solution and Simulation
 

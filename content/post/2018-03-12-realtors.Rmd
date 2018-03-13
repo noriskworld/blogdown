@@ -1,0 +1,68 @@
+---
+title: Realtors!
+author: Yunwei Hu
+date: '2018-03-12'
+slug: realtors
+categories: []
+tags: [rstats, investing, financial]
+---
+The new `realtR` package looks wonderful from the screenshot from [Alex Bresler](https://twitter.com/abresler/status/972997469872316417)!
+![realtR](https://pbs.twimg.com/media/DXylf3QWkAAjb85.jpg)
+Install with devtools.
+
+```{r}
+devtools::install_github("abresler/requestsR")
+devtools::install_github("abresler/requestsR")
+```
+Now let's try it out:
+
+```{r}
+# library(reticulate)
+# library(jsonlite)
+library(requestsR)
+# library(rvest)
+# library(listviewer)
+library(realtR)
+library(tidyverse)
+
+reticulate::use_python("/Users/myhome/anaconda/bin/python") # Use Anaconda not system PY
+```
+
+Try listings:
+
+```{r}
+
+my_neighbors <- realtR::listings(locations = c("Houston, TX", 77024, "Austin, TX"),
+                                 beds_min = 4)
+
+```
+Try to confirm 'requestR' was installed correctly
+
+```{r}
+
+resp <- Get(url = 'https://api.github.com/events')
+
+pyjson <- 
+  resp %>%
+  parse_response_json(is_data_frame = F)
+```
+Try use jsonlite directly
+```{r}
+x <- resp$content
+
+jsonlite::fromJSON(a, flatten = T)
+```
+
+```{r}
+a = substring(x, 2)
+
+jsonlite::fromJSON(a, flatten = T)
+
+```
+Py info
+
+```{r}
+print(reticulate::py_config())
+```
+
+Will try something later. 
