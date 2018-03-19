@@ -5,6 +5,8 @@ account: riskpredictions
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 294751
-bundleId: 1256381
+bundleId: 1276525
 url: https://riskpredictions.shinyapps.io/prob_plot/
-when: 1520399933.31879
+when: 1521475447.986
+asMultiple: FALSE
+asStatic: FALSE

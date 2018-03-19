@@ -36,7 +36,12 @@ ui <- fluidPage(
       # Show a plot of the generated distribution
       mainPanel(
          plotOutput("distPlot")
-      )
+      ),
+      tags$head(
+        tags$script(src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.5.16/iframeResizer.contentWindow.min.js",
+                    type="text/javascript")
+      ),
+      HTML('<div data-iframe-height></div>')
    )
 )
 
