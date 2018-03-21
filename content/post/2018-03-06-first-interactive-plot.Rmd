@@ -4,10 +4,10 @@ author: Yunwei Hu
 date: '2018-03-06'
 slug: first-interactive-plot
 categories:
-  - rstats
-  - webapp
+
 tags:
   - webapp
+  - rstats
 ---
 
 ## Interactive Plot in Blogdown
@@ -28,18 +28,5 @@ Add the code below to the end of the Rmarkdown post.
 
 Here it comes:
 
-# <iframe src = "https://riskpredictions.shinyapps.io/prob_plot/" frameborder="0" allowfullscreen width = 800 height = 800>
-# </iframe>
-
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.5.16/iframeResizer.min.js"></script>
-<style>
-  iframe {
-    min-width: 100%;
-  }
-</style>
-<iframe id="myIframe" src="https://riskpredictions.shinyapps.io/prob_plot/" scrolling="no" frameborder="no"></iframe>
-<script>
-  iFrameResize({
-    heightCalculationMethod: 'taggedElement'
-  });
-</script>
+<iframe src = "https://riskpredictions.shinyapps.io/prob_plot/" frameborder="0" allowfullscreen width = 800 height = 800>
+</iframe>

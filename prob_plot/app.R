@@ -12,12 +12,18 @@ library(tidyverse)
 
 # Define UI for application that draws a histogram
 ui <- fluidPage(
-   
+  tags$head(
+    tags$script(src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.5.16/iframeResizer.contentWindow.min.js",
+                type="text/javascript"),
    # Application title
    titlePanel("Lognormal vs Weibull - PDF"),
    
    # Sidebar with a slider input for number of bins 
    sidebarLayout(
+     # Show a plot of the generated distribution
+     mainPanel(
+       plotOutput("distPlot")
+     ),
       sidebarPanel(
         sliderInput("sdlog", 
                     label = "Lognormal - SD Log",
@@ -31,18 +37,11 @@ ui <- fluidPage(
         sliderInput("shape", 
                     label = "Weibull - Shape",
                     min = 0, max = 5, value = 1, step = 0.1)
-      ),
-      
-      # Show a plot of the generated distribution
-      mainPanel(
-         plotOutput("distPlot")
-      ),
-      tags$head(
-        tags$script(src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.5.16/iframeResizer.contentWindow.min.js",
-                    type="text/javascript")
-      ),
-      HTML('<div data-iframe-height></div>')
-   )
+      )
+
+      )
+   ),
+  HTML('<div data-iframe-height></div>')
 )
 
 # Define server logic required to draw a histogram
@@ -56,7 +55,7 @@ server <- function(input, output) {
                   pdf = c(dlnorm(x0, meanlog = input$meanlog, sdlog = input$sdlog), 
                           dweibull(x0, shape = input$shape, scale = input$scale)),
                   dis_type = c(rep("Log Normal", len), rep("Weibull", len)))
-     p <- ggplot(df) + geom_line( aes( y = pdf, x = x, color = dis_type))
+     p <- ggplot(df) + geom_line( aes( y = pdf, x = x, color = dis_type)) + theme(legend.position="top")
      print(p)
      })
 }

@@ -24,7 +24,7 @@ slug: discrete-event-simulation-des
 <h2>The GRP Model for Parametric Recurrent Event Data Analysis</h2>
 <p>We follow the convention in [Ref 1] (<a href="http://www.weibull.com/hotwire/issue59/relbasics59.htm" class="uri">http://www.weibull.com/hotwire/issue59/relbasics59.htm</a>). (Fix typo in type II eq.)</p>
 <blockquote>
-<p>In this model, the concept of virtual age is introduced. Denote by t1,t2,…,tn the successive failure times and let x1,x2,…,x3 represent the time between failures. Assume that after each event, actions are taken to improve the system performance. Let q be the action effectiveness factor. There are two GRP models. </br> - Type I: <span class="math inline">\(v_i = v_{i-1} + q \cdot x_i = q \cdot t_i\)</span> - Type II: <span class="math inline">\(v_i = q \cdot (v_{i-1} + x_i )= \sum_{k=1}^i q^{i-k+1} \cdot x_k\)</span></br> where <span class="math inline">\(v_i\)</span> is the virtual age of the system right after the ith repair. The Type I model assumes that the $i^{th} repair cannot remove the damage incurred before the <span class="math inline">\(i^{th}\)</span> failure. It can only reduce the additional age <span class="math inline">\(x_i\)</span> to <span class="math inline">\(q \cdot x_i\)</span>. The Type II model assumes that at the <span class="math inline">\(i^{th}\)</span> repair, the virtual age has been accumulated to <span class="math inline">\(v_{i-1} + x_i\)</span>. The <span class="math inline">\(i^{th}\)</span> repair will remove the cumulative damage from both current and previous failures by reducing the virtual age to <span class="math inline">\(q \cdot (v_{i-1} + x_i )\)</span>.</p>
+<p>In this model, the concept of virtual age is introduced. Denote by t1,t2,…,tn the successive failure times and let x1,x2,…,x3 represent the time between failures. Assume that after each event, actions are taken to improve the system performance. Let q be the action effectiveness factor. There are two GRP models. </br> - Type I: <span class="math inline">\(v_i = v_{i-1} + q \cdot x_i = q \cdot t_i\)</span> </br> - Type II: <span class="math inline">\(v_i = q \cdot (v_{i-1} + x_i )= \sum_{k=1}^i q^{i-k+1} \cdot x_k\)</span></br> where <span class="math inline">\(v_i\)</span> is the virtual age of the system right after the ith repair. The Type I model assumes that the $i^{th} repair cannot remove the damage incurred before the <span class="math inline">\(i^{th}\)</span> failure. It can only reduce the additional age <span class="math inline">\(x_i\)</span> to <span class="math inline">\(q \cdot x_i\)</span>. The Type II model assumes that at the <span class="math inline">\(i^{th}\)</span> repair, the virtual age has been accumulated to <span class="math inline">\(v_{i-1} + x_i\)</span>. The <span class="math inline">\(i^{th}\)</span> repair will remove the cumulative damage from both current and previous failures by reducing the virtual age to <span class="math inline">\(q \cdot (v_{i-1} + x_i )\)</span>.</p>
 </blockquote>
 </div>
 <div id="analytical-solution-and-simulation" class="section level2">
@@ -43,16 +43,8 @@ slug: discrete-event-simulation-des
 <div id="simgrp" class="section level3">
 <h3>simGRP</h3>
 <p>The simDRA function returns the data frame of the simulation results, given alpha, beta, q.</p>
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## ── Attaching packages ───────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
-<pre><code>## ✔ ggplot2 2.2.1     ✔ purrr   0.2.4
-## ✔ tibble  1.4.2     ✔ dplyr   0.7.4
-## ✔ tidyr   0.8.0     ✔ stringr 1.3.0
-## ✔ readr   1.1.1     ✔ forcats 0.3.0</code></pre>
-<pre><code>## ── Conflicts ──────────────────────────────────────── tidyverse_conflicts() ──
-## ✖ dplyr::filter() masks stats::filter()
-## ✖ dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code># Function to simulate the General Renewal Process
+<pre class="r"><code>library(tidyverse)
+# Function to simulate the General Renewal Process
 # Input, Weibull(Scale and Shape)
 simGRP &lt;- function (scale, shape = 1, q = 1, n_sim = 1e4, n_failure = 25) {
   ttf &lt;- matrix(NA, n_failure, n_sim )
@@ -80,7 +72,7 @@ ptm &lt;- proc.time()
 ttf &lt;- simGRP( scale = 100, shape = 1, q = 0, n_sim = 1e6, n_failure = 25)
 proc.time() - ptm</code></pre>
 <pre><code>##    user  system elapsed 
-##   3.824   0.450   4.285</code></pre>
+##   4.148   0.504   4.733</code></pre>
 </div>
 </div>
 <div id="data-analyis" class="section level2">
