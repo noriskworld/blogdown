@@ -1,0 +1,120 @@
+---
+title: Discrete Event Simulation - Part 1
+author: Yunwei Hu
+date: '2018-05-20'
+slug: discrete-event-simulation-part-1
+categories:
+  - simulation
+  - Reliability
+tags:
+  - DES
+  - Repairable
+  - python
+  - rstats
+---
+
+
+
+<div id="discrete-event-simulation-des-and-reliability-block-diagram-rbd" class="section level1">
+<h1>Discrete Event Simulation (DES) and Reliability Block Diagram (RBD)</h1>
+<p>DES is the simulation of stochastic processes with discrete state space, such as the classic M/M/1 queue: exponential interarrival and service times, with a single server. The state space can be defined as the queue length, which is integer-valued and thus “discrete.” This contrasts to, a continuous system, such as simulating a moving object, where state such as location is continuous.</p>
+<p>System Reliability can be a DES problem, if we only consider discrete state of the components and not the continous parameters. The classic System Reliability theories are discrete state, and most of the time binary states.</p>
+<p>A reliability block diagram (RBD) is one of the frequently used tool for modeling system reliability. It use a block diagram method to show how component reliability contributes to the success or failure of a complex system.</p>
+<p>Commercial Reliability Software packages, such as Reliasoft Blocksim(R), use RBD to model the system and then use analytical or simulation methods to calculate the system reliability metrics.</p>
+<p>The RBD is a graphical interface to build the DES. However, Reliasoft Blocksim limits itself to the binary states. A more generic DES is desirable in certain complex systems.</p>
+</div>
+<div id="des-in-python-and-r" class="section level1">
+<h1>DES in Python and R</h1>
+<p>DES are implemented in commercial software and also as generic framework in Java, Python, etc. SimPy is a process-based discrete-event simulation framework based on standard Python. More recenlty, Simmer is developed as a process-oriented and trajectory-based Discrete-Event Simulation (DES) package for R. It is designed to be a generic framework like SimPy or SimJulia, and it runs the DES with Rcpp to boost the performance and turning DES in R feasible.</p>
+<p>This post aims at evaluating Simpy and Simmer in the context of System Reliability.</p>
+</div>
+<div id="simpy-reticulate" class="section level1">
+<h1>Simpy + Reticulate</h1>
+<p>Reticulate package offers a set of tools for interoperability between Python and R. In this example, we use Reticulate to import a Simpy Model, and pass the simulation result to R as a data frame.</p>
+<div id="machie-shop-example" class="section level2">
+<h2>Machie Shop Example</h2>
+<div id="prepare-the-python" class="section level3">
+<h3>Prepare the python</h3>
+<pre class="r"><code>library(tidyverse)
+library(reticulate)
+use_python(&quot;/Users/myhome/anaconda/bin/python&quot;)
+source_python(&quot;simNHPP.py&quot;)</code></pre>
+</div>
+<div id="the-simpy-code" class="section level3">
+<h3>The Simpy Code</h3>
+<p>See blow:</p>
+<pre><code>import random
+import simpy
+import pandas as pd
+
+RANDOM_SEED = 42
+MTTF = 100.0                     # Mean time to failure in minutes
+REPAIR_TIME = 2.0               # Time it takes to repair a machine in minutes
+NUM_MACHINES = 1                  # Number of machines in the machine shop
+WEEKS = 4                         # Simulation time in weeks
+SIM_TIME = WEEKS * 7 * 24 * 60    # Simulation time in minutes
+
+
+
+def simNHPP(end_sim):
+    event_log = []
+    env = simpy.Environment()
+    machine_1 = Machine(env, &quot;Machine_1&quot;, event_log)
+    machine_2 = Machine(env, &quot;Machine_2&quot;, event_log)
+    env.run(until = end_sim)
+    event_log = pd.DataFrame(event_log, columns = [&#39;event&#39;,&#39;time&#39;])
+    return event_log
+
+def time_to_repair():
+    &quot;&quot;&quot;return time interval until the repair is done, and machine is ready to run again. &quot;&quot;&quot;
+    return REPAIR_TIME
+
+def time_to_failure():
+    &quot;&quot;&quot;Return time until next failure for a machine.&quot;&quot;&quot; 
+    return random.expovariate(1.0/MTTF)
+
+# each machine has a name, and pass the event_log 
+# time to failure and time to repair are defined globally. 
+class Machine:
+    def __init__(self, env, name, event_log):
+        self.env = env
+        self.name = str(name)
+        self.work_proc = env.process(self.working(env, event_log))
+
+    def working(self, env, event_log):
+        while True:
+            # Up until failure
+            time_to_fail = time_to_failure()
+            # print(&#39;%s: time to next failure is %.2f&#39; % (self.name, time_to_fail))
+            yield env.timeout(time_to_fail)
+
+            # Repair for time_to_repair
+            # print(&quot;%s Failure Starts at %.2f&quot; % (self.name, env.now))
+            event_log.append([self.name + &quot; fails&quot;, env.now])
+            repair_time = time_to_repair()
+            yield env.timeout(repair_time)
+            # print(&quot;%s is repaired at %.2f&quot; % (self.name, env.now))
+            event_log.append([self.name + &quot; fixed&quot;, env.now])</code></pre>
+<p>Simulation</p>
+<pre class="r"><code>ptm &lt;- proc.time()
+ev &lt;- 1:1000 %&gt;% 
+  map_df(function(x) cbind(simNHPP(SIM_TIME), tibble(n_run = x)))
+map_time &lt;- proc.time() - ptm
+print(map_time)</code></pre>
+<pre><code>##    user  system elapsed 
+##  12.677   0.078  12.793</code></pre>
+<pre class="r"><code>head(ev)</code></pre>
+<pre><code>##             event      time n_run
+## 1 Machine_2 fails  32.46467     1
+## 2 Machine_2 fixed  34.46467     1
+## 3 Machine_2 fails 120.30671     1
+## 4 Machine_2 fixed 122.30671     1
+## 5 Machine_1 fails 139.88521     1
+## 6 Machine_1 fixed 141.88521     1</code></pre>
+</div>
+</div>
+</div>
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<p>Modarres, Mohammad; Mark Kaminskiy; Vasiliy Krivtsov (1999). Reliability Engineering and Risk Analysis. Ney York, NY: Marcel Decker, Inc. p. 198. ISBN 0-8247-2000-8.</p>
+</div>
