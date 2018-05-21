@@ -13,6 +13,10 @@ tags:
   - rstats
 ---
 
+<script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="/rmarkdown-libs/viz/viz.js"></script>
+<link href="/rmarkdown-libs/DiagrammeR-styles/styles.css" rel="stylesheet" />
+<script src="/rmarkdown-libs/grViz-binding/grViz.js"></script>
 
 
 <div id="discrete-event-simulation-des-and-reliability-block-diagram-rbd" class="section level1">
@@ -95,22 +99,128 @@ class Machine:
             yield env.timeout(repair_time)
             # print(&quot;%s is repaired at %.2f&quot; % (self.name, env.now))
             event_log.append([self.name + &quot; fixed&quot;, env.now])</code></pre>
-<p>Simulation</p>
+</div>
+<div id="simulation" class="section level3">
+<h3>Simulation</h3>
 <pre class="r"><code>ptm &lt;- proc.time()
 ev &lt;- 1:1000 %&gt;% 
   map_df(function(x) cbind(simNHPP(SIM_TIME), tibble(n_run = x)))
 map_time &lt;- proc.time() - ptm
 print(map_time)</code></pre>
 <pre><code>##    user  system elapsed 
-##  12.677   0.078  12.793</code></pre>
+##  11.950   0.060  12.015</code></pre>
 <pre class="r"><code>head(ev)</code></pre>
 <pre><code>##             event      time n_run
-## 1 Machine_2 fails  32.46467     1
-## 2 Machine_2 fixed  34.46467     1
-## 3 Machine_2 fails 120.30671     1
-## 4 Machine_2 fixed 122.30671     1
-## 5 Machine_1 fails 139.88521     1
-## 6 Machine_1 fixed 141.88521     1</code></pre>
+## 1 Machine_2 fails  21.16895     1
+## 2 Machine_2 fixed  23.16895     1
+## 3 Machine_1 fails  91.62575     1
+## 4 Machine_1 fixed  93.62575     1
+## 5 Machine_2 fails 105.42237     1
+## 6 Machine_2 fixed 107.42237     1</code></pre>
+</div>
+</div>
+</div>
+<div id="r-simmer" class="section level1">
+<h1>R-simmer</h1>
+<p>R-simmer has similar implentation as Simpy, but with Simmer, everything is monitored automatically, and reported in handy data frames. This works especially well when doing many replications.</p>
+<div id="prepare-enviroment" class="section level2">
+<h2>Prepare enviroment</h2>
+<pre class="r"><code>library(tidyverse)
+library(simmer)
+library(simmer.plot)</code></pre>
+</div>
+<div id="define-machie" class="section level2">
+<h2>Define Machie</h2>
+<pre class="r"><code>machine &lt;- function(mttf, repair_time, print_log = TRUE){
+  if (print_log) {
+      machie &lt;- trajectory() %&gt;% 
+        set_attribute(&quot;n_fail&quot;, 0) %&gt;% 
+        timeout(function() rexp(1, 1/mttf)) %&gt;% 
+        log_(&quot;fail&quot;) %&gt;% 
+        set_attribute(&quot;n_fail&quot;, 1, mod=&quot;+&quot;) %&gt;%
+        seize(&quot;repairman&quot;) %&gt;% 
+        timeout(repair_time) %&gt;% 
+        release(&quot;repairman&quot;) %&gt;% 
+        log_(&quot;fixed&quot;) %&gt;% 
+        rollback(7)
+  } else {
+      machie &lt;- trajectory() %&gt;% 
+        set_attribute(&quot;n_fail&quot;, 0) %&gt;% 
+        timeout(function() rexp(1, 1/mttf)) %&gt;% 
+        set_attribute(&quot;n_fail&quot;, 1, mod=&quot;+&quot;) %&gt;%
+        seize(&quot;repairman&quot;) %&gt;% 
+        timeout(repair_time) %&gt;% 
+        release(&quot;repairman&quot;) %&gt;% 
+        rollback(5)
+    
+  }
+
+}
+plot(machine(10,1))</code></pre>
+<div id="htmlwidget-1" style="width:672px;height:480px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"diagram":"digraph {\n\ngraph [layout = \"dot\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"sans-serif\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"1.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"SetAttribute\", shape = \"box\", style = \"solid\", color = \"black\", tooltip = \"keys: [n_fail, ], values: [0, ], global: 0, mod: N\", fontcolor = \"black\", fillcolor = \"#000000\"] \n  \"2\" [label = \"Timeout\", shape = \"box\", style = \"solid\", color = \"black\", tooltip = \"delay: 0x7ff679bf0508\", fontcolor = \"black\", fillcolor = \"#000000\"] \n  \"3\" [label = \"Log\", shape = \"box\", style = \"solid\", color = \"black\", tooltip = \"message\", fontcolor = \"black\", fillcolor = \"#000000\"] \n  \"4\" [label = \"SetAttribute\", shape = \"box\", style = \"solid\", color = \"black\", tooltip = \"keys: [n_fail, ], values: [1, ], global: 0, mod: +\", fontcolor = \"black\", fillcolor = \"#000000\"] \n  \"5\" [label = \"Seize\", shape = \"box\", style = \"filled\", color = \"#7FC97F\", tooltip = \"resource: repairman, amount: 1\", fontcolor = \"black\", fillcolor = \"#7FC97F\"] \n  \"6\" [label = \"Timeout\", shape = \"box\", style = \"solid\", color = \"black\", tooltip = \"delay: 1\", fontcolor = \"black\", fillcolor = \"#000000\"] \n  \"7\" [label = \"Release\", shape = \"box\", style = \"filled\", color = \"#7FC97F\", tooltip = \"resource: repairman, amount: 1\", fontcolor = \"black\", fillcolor = \"#7FC97F\"] \n  \"8\" [label = \"Log\", shape = \"box\", style = \"solid\", color = \"black\", tooltip = \"message\", fontcolor = \"black\", fillcolor = \"#000000\"] \n  \"9\" [label = \"Rollback\", shape = \"diamond\", style = \"filled\", color = \"lightgrey\", tooltip = \"times: -1\", fontcolor = \"black\", fillcolor = \"#D3D3D3\"] \n\"1\"->\"2\" [color = \"black\", style = \"solid\"] \n\"2\"->\"3\" [color = \"black\", style = \"solid\"] \n\"3\"->\"4\" [color = \"black\", style = \"solid\"] \n\"4\"->\"5\" [color = \"black\", style = \"solid\"] \n\"5\"->\"6\" [color = \"black\", style = \"solid\"] \n\"6\"->\"7\" [color = \"black\", style = \"solid\"] \n\"7\"->\"8\" [color = \"black\", style = \"solid\"] \n\"8\"->\"9\" [color = \"black\", style = \"solid\"] \n\"9\"->\"2\" [color = \"grey\", style = \"dashed\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<pre class="r"><code>simmer_relia &lt;- function(sim_time, print_log = T) {
+  env &lt;- simmer() %&gt;% 
+  # use resource to track system state
+  # all items in series will require same &quot;repair&quot; resource. 
+  # set capacity to inf, assuming no queue for repair
+  # if repair resource busy -&gt; system down
+  # for n-oo-k items, if resource server &gt; k-n -&gt;system down 
+  add_resource(&quot;repairman&quot;, capacity = Inf) %&gt;% 
+  add_generator(&quot;machine_a&quot;, machine(100, 1, print_log), at(0), mon = 2) %&gt;% 
+  add_generator(&quot;machine_b&quot;, machine(100, 1, print_log), at(0), mon = 2) %&gt;% 
+  run(sim_time)
+  repair_log &lt;- get_mon_resources(env)
+}</code></pre>
+<p>Plot the repair_log</p>
+<pre class="r"><code># n_fail &lt;- get_mon_attributes(env)
+repair_log &lt;- simmer_relia(100)</code></pre>
+<pre><code>## 82.548: machine_a0: fail
+## 83.548: machine_a0: fixed
+## 90.7426: machine_b0: fail
+## 91.7426: machine_b0: fixed</code></pre>
+<pre class="r"><code>plot(repair_log, metric = &quot;usage&quot;, &quot;repairman&quot;, items = &quot;server&quot;, steps = TRUE)</code></pre>
+<p><img src="/post/2018-05-20-discrete-event-simulation-part-1_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>Calculate System Downtime, assuming in series.</p>
+<pre class="r"><code>repair_log &lt;- repair_log %&gt;% 
+  mutate(duration = c(diff(time),0)) %&gt;% 
+  # assuming series, any item down -&gt; system down
+  mutate(sys_state = if_else(server &gt; 0, 0, 1) ) %&gt;%
+  dplyr::rename(state_start = time) 
+
+downtime &lt;- repair_log %&gt;% 
+  group_by(sys_state) %&gt;% 
+  summarise(duration = sum(duration)) 
+print(downtime)</code></pre>
+<pre><code>## # A tibble: 2 x 2
+##   sys_state duration
+##       &lt;dbl&gt;    &lt;dbl&gt;
+## 1         0     2   
+## 2         1     7.19</code></pre>
+<div id="loop" class="section level3">
+<h3>loop</h3>
+<pre class="r"><code>ptm &lt;- proc.time()
+repair_log &lt;- 1:1000 %&gt;% 
+  map_df(function(x) cbind(simmer_relia(SIM_TIME, F), tibble(n_run = x)))
+simmer_time &lt;- proc.time() - ptm
+print(simmer_time)</code></pre>
+<pre><code>##    user  system elapsed 
+##  25.919   0.275  26.412</code></pre>
+<pre class="r"><code>tail(repair_log)</code></pre>
+<pre><code>##          resource     time server queue capacity queue_size system limit
+## 1595528 repairman 40045.93      1     0      Inf        Inf      1   Inf
+## 1595529 repairman 40046.93      0     0      Inf        Inf      0   Inf
+## 1595530 repairman 40174.67      1     0      Inf        Inf      1   Inf
+## 1595531 repairman 40175.67      0     0      Inf        Inf      0   Inf
+## 1595532 repairman 40189.78      1     0      Inf        Inf      1   Inf
+## 1595533 repairman 40190.78      0     0      Inf        Inf      0   Inf
+##         replication n_run
+## 1595528           1  1000
+## 1595529           1  1000
+## 1595530           1  1000
+## 1595531           1  1000
+## 1595532           1  1000
+## 1595533           1  1000</code></pre>
 </div>
 </div>
 </div>

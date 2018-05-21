@@ -102,7 +102,7 @@ class Machine:
             # print("%s is repaired at %.2f" % (self.name, env.now))
             event_log.append([self.name + " fixed", env.now])
 ```
-Simulation
+### Simulation
 
 ```{r}
 ptm <- proc.time()
@@ -113,7 +113,102 @@ print(map_time)
 head(ev)
 ```
 
+# R-simmer
 
+R-simmer has similar implentation as Simpy, but with Simmer, everything is monitored automatically, and reported in handy data frames. This works especially well when doing many replications.
+
+## Prepare enviroment
+
+
+```{r, message = FALSE}
+library(tidyverse)
+library(simmer)
+library(simmer.plot)
+```
+
+## Define Machie
+
+```{r}
+machine <- function(mttf, repair_time, print_log = TRUE){
+  if (print_log) {
+      machie <- trajectory() %>% 
+        set_attribute("n_fail", 0) %>% 
+        timeout(function() rexp(1, 1/mttf)) %>% 
+        log_("fail") %>% 
+        set_attribute("n_fail", 1, mod="+") %>%
+        seize("repairman") %>% 
+        timeout(repair_time) %>% 
+        release("repairman") %>% 
+        log_("fixed") %>% 
+        rollback(7)
+  } else {
+      machie <- trajectory() %>% 
+        set_attribute("n_fail", 0) %>% 
+        timeout(function() rexp(1, 1/mttf)) %>% 
+        set_attribute("n_fail", 1, mod="+") %>%
+        seize("repairman") %>% 
+        timeout(repair_time) %>% 
+        release("repairman") %>% 
+        rollback(5)
+    
+  }
+
+}
+plot(machine(10,1))
+```
+
+
+
+```{r}
+simmer_relia <- function(sim_time, print_log = T) {
+  env <- simmer() %>% 
+  # use resource to track system state
+  # all items in series will require same "repair" resource. 
+  # set capacity to inf, assuming no queue for repair
+  # if repair resource busy -> system down
+  # for n-oo-k items, if resource server > k-n ->system down 
+  add_resource("repairman", capacity = Inf) %>% 
+  add_generator("machine_a", machine(100, 1, print_log), at(0), mon = 2) %>% 
+  add_generator("machine_b", machine(100, 1, print_log), at(0), mon = 2) %>% 
+  run(sim_time)
+  repair_log <- get_mon_resources(env)
+}
+
+```
+
+Plot the repair_log
+```{r}
+# n_fail <- get_mon_attributes(env)
+repair_log <- simmer_relia(100)
+plot(repair_log, metric = "usage", "repairman", items = "server", steps = TRUE)
+```
+
+Calculate System Downtime, assuming in series.
+
+```{r}
+
+repair_log <- repair_log %>% 
+  mutate(duration = c(diff(time),0)) %>% 
+  # assuming series, any item down -> system down
+  mutate(sys_state = if_else(server > 0, 0, 1) ) %>%
+  dplyr::rename(state_start = time) 
+
+downtime <- repair_log %>% 
+  group_by(sys_state) %>% 
+  summarise(duration = sum(duration)) 
+print(downtime)
+```
+
+### loop
+
+```{r}
+ptm <- proc.time()
+repair_log <- 1:1000 %>% 
+  map_df(function(x) cbind(simmer_relia(SIM_TIME, F), tibble(n_run = x)))
+simmer_time <- proc.time() - ptm
+print(simmer_time)
+tail(repair_log)
+```
 
 # Reference
 Modarres, Mohammad; Mark Kaminskiy; Vasiliy Krivtsov (1999). Reliability Engineering and Risk Analysis. Ney York, NY: Marcel Decker, Inc. p. 198. ISBN 0-8247-2000-8.
