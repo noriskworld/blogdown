@@ -1,0 +1,165 @@
+---
+title: Discrete Event Simulation - Part 2
+author: Yunwei Hu
+date: '2018-05-21'
+slug: discrete-event-simulation-part-2
+categories:
+  - Reliability
+tags:
+  - DES
+  - rstats
+  - simulation
+---
+```{r, message=FALSE}
+#prepare the libraries
+library(tidyverse)
+library(simmer)
+library(simmer.plot)
+library(intervals)
+```
+# Simmer for R
+
+R is my language of choice. Sorry, Python, I love you too, but life is too short to have two favorite languages. 
+
+In my short experiment with Simpy and Simmer, Simmer shines in one area: monitoring. 
+In Simpy a list can be past to the simulation, and it is flexible to choose what to code. 
+
+With Simmer, three commands `get_mon_arrivals(), get_mon_attributes(), get_mon_resources()` can generate the story book of the simulation. The story is in data.frame format, and can be easily processed in R. 
+
+Let's use the Machie Shop as an Example. 
+
+Instead of print out the events in user interface with `log_()`, we make the simulation `invisible`, and add an attribute to log the state (working, fail). 
+
+```{r}
+machine <- function(mttf, repair_time){
+      machie <- trajectory() %>% 
+      # machine_state: 1-working, 0-fail
+      set_attribute("machine_state", 1) %>% 
+        timeout(function() rexp(1, 1/mttf)) %>% 
+        set_attribute("machine_state", -1, mod="+") %>%
+        seize("repairman") %>% 
+        timeout(repair_time) %>% 
+        release("repairman") %>% 
+        set_attribute("machine_state", 1, mod="+") %>% 
+        rollback(6)
+  } 
+plot(machine(10,1))
+```
+
+Make it a function.
+
+```{r}
+simmer_relia <- function(sim_time, mon_ = "attributes") {
+  env <- simmer() %>% 
+  # use resource to track system state
+  # all items in series will require same "repair" resource. 
+  # set capacity to inf, assuming no queue for repair
+  # if repair resource busy -> system down
+  # for n-oo-k items, if resource server > k-n ->system down 
+  add_resource("repairman", capacity = Inf) %>% 
+  add_generator("machine_a", machine(100, 10), at(0), mon = 2) %>% 
+  add_generator("machine_b", machine(100, 5), at(0), mon = 2) %>% 
+  run(sim_time) %>% 
+  invisible
+  if (mon_=="resources"){
+    sim_log <- get_mon_resources(env)
+  } else if (mon_=="attributes") {
+    sim_log <- get_mon_attributes(env)
+  }
+  sim_log
+}
+
+```
+
+## Loop for replications
+```{r}
+N_RUN <-  10
+SIM_END = 500
+ptm <- proc.time()
+machine_state_log <- 1:N_RUN %>% 
+  map_df(function(x) cbind(simmer_relia(SIM_END), tibble(i_run = x)))
+simmer_time <- proc.time() - ptm
+tail(machine_state_log)
+```
+
+
+
+Test
+```{r}
+simu_attributes <- simmer_relia(500)
+print(simu_attributes)
+```
+```{r}
+simu_resources <- simmer_relia(500, mon = "resources")
+plot(simu_resources, metric = "usage", "repairman", items = "server", steps = TRUE)
+```
+
+# Monitoring: resources vs attributes
+
+With simmer, by adding user-defined attributes, we can log the simualtion flexibly. In the context of the system reliability, since only one "repariman" resource is requested when ANY of the machines fail, the "repairman" resource can be used directly for simple system reliability metrics. If the it is series system, whenever the repairman is busy, the system is down. Or it is n-out-of-k, then >= n simultaneous "repairs" implies system down. 
+
+The attribute logs the state of all the "machines", it is more flexible to use the attributes. We are interest in the event sequence of the system down time, the `Intervals` pacakge, which provides a collections of operation on intervals over the real number line (R), is helpful the determine the system state base on the component state. 
+
+In the example above, we have the event sequence of the machine_a and machine_b, so for a parellel system, the intersection of downtime interval is the system down time. and for a series system, union. 
+
+## Convert event sequences to state intervals
+
+```{r}
+machine_state_interval <- function(machine_state_log){
+  machine_state_log %>%
+    group_by(i_run, name) %>% 
+    arrange(time) %>% 
+    # end_time is lead(start_time) (remove leading NA), last one is sim_end
+    mutate(end_time = c(head(lead(time), -1), SIM_END)) %>% 
+    ungroup() %>% 
+    dplyr::select(name, value, start_time = time, end_time, i_run) %>% 
+    arrange(i_run, name, start_time)
+}
+
+state_interval <- machine_state_interval(machine_state_log)
+
+machine_down_interval <- function(state_interval, i, machine_name){
+  fail_log <- state_interval %>% 
+    filter(i_run == i, name == machine_name) %>% 
+    filter(value == 0)
+  Intervals(matrix(c(fail_log$start_time,fail_log$end_time), ncol = 2))
+} 
+```
+
+## parallel -> intersection of the interval
+
+```{r}
+parallel_down_log <- tibble(start_time = as.numeric(), end_time = as.numeric(), i_run = as.integer())
+
+for (i in 1:N_RUN){
+  parallel_down_interval <- interval_intersection(
+    machine_down_interval(state_interval, i, "machine_a0"), 
+    machine_down_interval(state_interval, i, "machine_b0") )
+  if(length(parallel_down_interval) > 0){
+    print(i)
+    print(parallel_down_interval)
+    parallel_down_log <- rbind(parallel_down_log, 
+                            cbind(as.matrix(parallel_down_interval), tibble(i_run = i)))
+  }
+}
+names(parallel_down_log) <- c("start", "end", "i_run")
+print(parallel_down_log)
+```
+
+## Series -> union of the interval 
+
+```{r}
+series_down_log <- tibble(start_time = as.numeric(), end_time = as.numeric(), i_run = as.integer())
+
+for (i in 1:N_RUN){
+  series_down_interval <- interval_union(
+    machine_down_interval(state_interval, i, "machine_a0"), 
+    machine_down_interval(state_interval, i, "machine_b0") )
+  if(length(series_down_interval) > 0){
+    series_down_log <- rbind(series_down_log, 
+                             cbind(as.matrix(series_down_interval), tibble(i_run = i)))
+  }
+}
+names(series_down_log) <- c("start", "end", "i_run")
+head(series_down_log,20)
+```
