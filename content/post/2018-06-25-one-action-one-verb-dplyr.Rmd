@@ -1,0 +1,33 @@
+---
+title: 'One action one verb. dplyr::'
+author: Yunwei Hu
+date: '2018-06-25'
+slug: one-action-one-verb-dplyr
+categories:
+  - rstats
+tags:
+  - tidyverse
+---
+
+# base::cbind vs dplyr::bind_cols
+
+I ran into some trouble while converting some my [codes](http://www.riskpredictions.info/2018/05/20/discrete-event-simulation-part-1/) to tidyverse, and the bind_cols returned some error message:
+```
+"Arguement 2 must be length 1, not 3"
+```
+
+Apparently, base:cbind recycle the 1-row dataframe, while dplyr::bind_cols does not. 
+
+A quick google gives me the github [reply](https://github.com/tidyverse/dplyr/issues/3170).
+
+The key message from the developer is:  
+> this would add a lot of complexity to the implementation, and allow for mistakes. You can already use add_column().
+
+I am convinced, I was not trying to bind a dataframe, I was adding a column to the dataframe.
+
+If it is different action, use a different verb(function).
+
+> “Write with nouns and verbs, not with adjectives and adverbs. The adjective hasn't been built that can pull a weak or inaccurate noun out of a tight place.”  
+> ― E.B. White
+
+
