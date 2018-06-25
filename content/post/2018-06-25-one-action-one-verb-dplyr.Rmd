@@ -23,12 +23,10 @@ The key message from the developer is:
 
 > this would add a lot of complexity to the implementation, and allow for mistakes. You can already use add_column().
 
-I am convinced. I was not trying to bind a dataframe *with recycling*, I was adding a column to the dataframe.
+I am convinced, I was not trying to bind a dataframe *with recycling*, I was adding a column to the dataframe.
 
 If it is different action, use a different verb(function).
 
 > “Write with nouns and verbs, not with adjectives and adverbs. The adjective hasn't been built that can pull a weak or inaccurate noun out of a tight place.”  
 > - Strunk and White; *The Elements of Style*
-
-
 
