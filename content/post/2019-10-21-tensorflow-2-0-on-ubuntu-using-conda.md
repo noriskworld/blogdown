@@ -42,5 +42,10 @@ import tensorflow.keras.backend as K
 gpus = tf.config.experimental.list_physical_devices('GPU')
 tf.config.experimental.set_memory_growth(gpus[0], True)
 ```
+Otherwise, GPU cannot be allocated. You may receive an error message similar to below:
 
+```
+UnknownError:  Failed to get convolution algorithm. This is probably because cuDNN failed to initialize, so try looking to see if a warning log message was printed above.
+	 [[node model/conv1d_1/conv1d (defined at /home/jason/anaconda3/envs/tf2gpu/lib/python3.6/site-packages/tensorflow_core/python/framework/ops.py:1751) ]] [Op:__inference_distributed_function_14081]
+```
 And, that is it. 
