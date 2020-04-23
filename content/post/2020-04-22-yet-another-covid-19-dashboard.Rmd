@@ -1,0 +1,61 @@
+---
+title: Yet Another COVID-19 Dashboard
+author: Yunwei Hu
+date: '2020-04-22'
+slug: yet-another-covid-19-dashboard
+categories:
+  - rstats
+  - shiny
+tags: []
+---
+# Introduction
+
+It is hard to believe it has only been several months since the outbreak of the COVID-19, and everyone is feeling the weight of the it now. 
+
+There is no lack of information available online today, on the contrary the amount of information is overhelming. Let's forget the misinformation, disinformation, and propaganda for now. Because CDC is basically MIA in this round, we have to rely on scientists, journalists and volunteers to maintain good quality of data.
+
+R community is very active, *Stats and R* listed [top 50 R resources](https://www.statsandr.com/blog/top-r-resources-on-covid-19-coronavirus/) on 3/12/2020, which is a **long** time ago. 
+
+I build yet another [dashboard,](https://riskpredictions.shinyapps.io/covid19dash/) thanks to the generous offer of Shinyapps by [Rstudio.](https://blog.rstudio.com/2020/04/17/rstudio-and-covid-19/) 
+
+# Motivations
+Plenty of excellent covid-19 data sources and dashboard already exist. I only list a few that I use every day:
+- [JHU COVID-19 Map](https://coronavirus.jhu.edu/map.html)
+- [COVID tracking project](https://covidtracking.com/data)
+
+I live in Houston, Tx. A simple question I ask myself is that how many cases in Houston? 
+
+It is not easy. The City of Houston is inside the boundary of Harris County. The city and county have independent depart of health, thus they report their case counts independently. The ajacent counties are also considered Houston Metropolitan, but they also have their own health care systems. 
+
+The virus does not know the city jurisdiction, or county borders. The people live here traveling every day do not care about it. However, the health systems only operate in their boundaries.
+
+The situation is similar all over the United States. 
+
+The best source to answer that question is at [New York Times](https://www.nytimes.com/interactive/2020/04/03/upshot/coronavirus-metro-area-tracker.html)
+
+I started by trying to reproduce what New York Times did. 
+
+# Data Sources
+
+A good clean time series data would be essential for the dashboard. Both covidtrakcing and JHU provide daily time series. However covidtracking data only report at state level. So I use the [JHU Time Series](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series) for the dashboard.
+
+The confirmed cases and deaths are updated daily at county level, and the FIPS code and population is provided. 
+
+To combined ajacent counties to their metropolitan, I use the OMB Metropolititan delineation, which can be downloaded from [Census](https://www.census.gov/geographies/reference-files/time-series/demo/metro-micro/delineation-files.html).
+
+The excel file used is from the [Core based statistical areas (CBSAs), metropolitan divisions, and combined statistical areas (CSAs)](https://www2.census.gov/programs-surveys/metro-micro/geographies/reference-files/2018/delineation-files/list1_Sep_2018.xls)
+
+# Reproduction Number
+
+As we are apparently moving close to the peak, or even past the peak in certain areas, it is critical to evaluate the effective reproduction number. A good summary of the [estimation and implementation in R](https://staff.math.su.se/hoehle/blog/2020/04/15/effectiveR0.html) is provided by [Michael Höhle](https://staff.math.su.se/hoehle/blog/about/).
+
+The RKI method is fairly straight forward. Given that the data is messy and heavily under reported, and clearly influenced by week of day and testing volumn, I will not spend time debating the abosulte best algorithm, and I am no expert in the field, and my choice is basically a coin flip. The coin says "RKI".
+
+However, because of the fluctuation of reported case counts, the $R_e$ is everywhere. As we have observed strongly the week-of-day impact, instead I use the 7-day moving average as the input to the $R_e$ estimation. 
+
+And here it is. Or view it in a new [window.](https://riskpredictions.shinyapps.io/covid19dash/) 
+
+<iframe src="https://riskpredictions.shinyapps.io/covid19dash/" width=1200 height=800"></iframe>
+
+Thanks!
+
