@@ -2,7 +2,7 @@
 .Rhistory
 .RData
 .Ruserdata
-blogdown
+/blogdown
 Thumbs.db
 public/
 scrap.R
