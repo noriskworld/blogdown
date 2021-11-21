@@ -87,16 +87,65 @@ ex_info %>%
 ```{r}
 library(tidyquant)
 tiingo_api_key('86771cb62164b5be7a3cbb13db57cf4c8ac4e251')
+```
+Candlestick Chart
+```{r}
+end = ymd(20211115)
 # Tiingo Bitcoin in USD ----
-tq_get(c("btcusd"),
+btc_usd <- tq_get(c("btcusd"),
        get    = "tiingo.crypto",
-       from   = "2021-03-01",
-       to     = "2021-11-10",
-       resample_frequency = "1day") %>% 
+       from   = "2021-09-01",
+       to     = "2021-11-19")
+ #,resample_frequency = "1day")
+btc_usd %>% 
+  # change the date format to `Date` for geom_candlestick. 
+  mutate(date = as.Date(date)) %>% 
   ggplot(aes(x = date, y = close)) +
-    geom_candlestick(aes(open = open, high = high, low = low, close = close)) +
-    labs(title = "AAPL Candlestick Chart", y = "Closing Price", x = "") +
+    geom_candlestick(aes(open = open, high = high, low = low, close = close),
+                      colour_up = "darkgreen", colour_down = "darkred", 
+                      fill_up  = "darkgreen", fill_down  = "darkred")  +
+    labs(title = "BTCUSD Candlestick Chart", y = "Closing Price", x = "") +
     theme_tq()
 
+```
+```{r}
+eth_usd <- tq_get(c("btcusd"),
+       get    = "tiingo.crypto",
+       from   = "2021-09-01",
+       to     = "2021-11-19")
+ #,resample_frequency = "1day")
+eth_usd %>% 
+  # change the date format to `Date` for geom_candlestick. 
+  mutate(date = as.Date(date)) %>% 
+  ggplot(aes(x = date, y = close)) +
+    geom_candlestick(aes(open = open, high = high, low = low, close = close),
+                      colour_up = "darkgreen", colour_down = "darkred", 
+                      fill_up  = "darkgreen", fill_down  = "darkred")  +
+    labs(title = "ETHUSD Candlestick Chart", y = "Closing Price", x = "") +
+    theme_tq()
+
+```
+
+Pull AAPL stock price
+```{r}
+AAPL <- tq_get("AAPL", get = "stock.prices", 
+               from = "2021-09-01", to = "2021-11-16")
+```
+
+```{r}
+
+
+AAPL %>%
+    ggplot(aes(x = date, y = close)) +
+    geom_candlestick(aes(open = open, high = high, low = low, close = close),
+                        colour_up = "darkgreen", colour_down = "darkred", 
+                        fill_up  = "darkgreen", fill_down  = "darkred", 
+                     size = 1) +
+    labs(title = "AAPL Candlestick Chart", 
+         subtitle = "Zoomed in, Experimenting with Formatting",
+         y = "Closing Price", x = "") + 
+    coord_x_date(xlim = c(end - weeks(6), end),
+                 ylim = c(130, 160)) + 
+    theme_tq()
 ```
 

@@ -20,9 +20,9 @@ tags:
 library(tidyverse)</code></pre>
 <pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
 <pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
-## ✓ tibble  3.1.5     ✓ dplyr   1.0.7
+## ✓ tibble  3.1.6     ✓ dplyr   1.0.7
 ## ✓ tidyr   1.1.4     ✓ stringr 1.4.0
-## ✓ readr   2.0.2     ✓ forcats 0.5.1</code></pre>
+## ✓ readr   2.1.0     ✓ forcats 0.5.1</code></pre>
 <pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## x dplyr::filter() masks stats::filter()
 ## x dplyr::lag()    masks stats::lag()</code></pre>
@@ -144,20 +144,20 @@ coin_hist2 %&gt;%
 <p>Last and least, one can get information on exchanges. For this download a list of active/inactive/untracked exchanges using exchange_list():</p>
 <pre class="r"><code>exchanges &lt;- exchange_list(only_active=TRUE)
 exchanges</code></pre>
-<pre><code>## # A tibble: 430 × 6
+<pre><code>## # A tibble: 431 × 6
 ##       id name         slug         is_active first_historical_… last_historical…
 ##    &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;            &lt;int&gt; &lt;date&gt;             &lt;date&gt;          
-##  1    16 Poloniex     poloniex             1 2018-04-26         2021-11-13      
-##  2    22 Bittrex      bittrex              1 2018-04-26         2021-11-13      
-##  3    24 Kraken       kraken               1 2018-04-26         2021-11-13      
+##  1    16 Poloniex     poloniex             1 2018-04-26         2021-11-21      
+##  2    22 Bittrex      bittrex              1 2018-04-26         2021-11-21      
+##  3    24 Kraken       kraken               1 2018-04-26         2021-11-21      
 ##  4    32 Bleutrade    bleutrade            1 2018-04-26         2021-10-04      
-##  5    34 Bittylicious bittylicious         1 2018-04-26         2021-11-13      
-##  6    36 CEX.IO       cex-io               1 2018-04-26         2021-11-13      
-##  7    37 Bitfinex     bitfinex             1 2018-04-26         2021-11-13      
-##  8    42 HitBTC       hitbtc               1 2018-04-26         2021-11-13      
-##  9    50 EXMO         exmo                 1 2018-04-26         2021-11-13      
-## 10    61 Okcoin       okcoin               1 2018-04-26         2021-11-13      
-## # … with 420 more rows</code></pre>
+##  5    34 Bittylicious bittylicious         1 2018-04-26         2021-11-21      
+##  6    36 CEX.IO       cex-io               1 2018-04-26         2021-11-21      
+##  7    37 Bitfinex     bitfinex             1 2018-04-26         2021-11-21      
+##  8    42 HitBTC       hitbtc               1 2018-04-26         2021-11-21      
+##  9    50 EXMO         exmo                 1 2018-04-26         2021-11-21      
+## 10    61 Okcoin       okcoin               1 2018-04-26         2021-11-21      
+## # … with 421 more rows</code></pre>
 <p>and then download information on “binance” and “kraken”:</p>
 <pre class="r"><code>ex_info &lt;- exchange_info(exchanges %&gt;% 
                            filter(slug %in% c(&#39;binance&#39;,&#39;kraken&#39;)))</code></pre>
@@ -188,8 +188,8 @@ exchanges</code></pre>
 <pre><code>## # A tibble: 2 × 2
 ##   spot_volume_usd spot_volume_last_updated
 ##             &lt;dbl&gt; &lt;dttm&gt;                  
-## 1     1549383768. 2021-11-13 07:40:16     
-## 2    29299675530. 2021-11-13 07:40:16</code></pre>
+## 1      760770042. 2021-11-21 07:40:15     
+## 2    31807220533. 2021-11-21 07:40:15</code></pre>
 </div>
 <div id="tidyquant" class="section level1">
 <h1>Tidyquant</h1>
@@ -228,15 +228,55 @@ exchanges</code></pre>
 ## &lt;/&gt; Learn more at: https://university.business-science.io/p/learning-labs-pro &lt;/&gt;</code></pre>
 <pre class="r"><code>tiingo_api_key(&#39;86771cb62164b5be7a3cbb13db57cf4c8ac4e251&#39;)</code></pre>
 <pre><code>## Token has been set for this R session only. It is recommended to instead set the `RIINGO_TOKEN` environment variable in an `.Renviron` file using `usethis::edit_r_environ()`, and then restart R.</code></pre>
-<pre class="r"><code># Tiingo Bitcoin in USD ----
-tq_get(c(&quot;btcusd&quot;),
+<p>Candlestick Chart</p>
+<pre class="r"><code>end = ymd(20211115)
+# Tiingo Bitcoin in USD ----
+btc_usd &lt;- tq_get(c(&quot;btcusd&quot;),
        get    = &quot;tiingo.crypto&quot;,
-       from   = &quot;2021-03-01&quot;,
-       to     = &quot;2021-11-10&quot;,
-       resample_frequency = &quot;1day&quot;) %&gt;% 
+       from   = &quot;2021-09-01&quot;,
+       to     = &quot;2021-11-19&quot;)
+ #,resample_frequency = &quot;1day&quot;)
+btc_usd %&gt;% 
+  # change the date format to `Date` for geom_candlestick. 
+  mutate(date = as.Date(date)) %&gt;% 
   ggplot(aes(x = date, y = close)) +
-    geom_candlestick(aes(open = open, high = high, low = low, close = close)) +
-    labs(title = &quot;AAPL Candlestick Chart&quot;, y = &quot;Closing Price&quot;, x = &quot;&quot;) +
+    geom_candlestick(aes(open = open, high = high, low = low, close = close),
+                      colour_up = &quot;darkgreen&quot;, colour_down = &quot;darkred&quot;, 
+                      fill_up  = &quot;darkgreen&quot;, fill_down  = &quot;darkred&quot;)  +
+    labs(title = &quot;BTCUSD Candlestick Chart&quot;, y = &quot;Closing Price&quot;, x = &quot;&quot;) +
     theme_tq()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<pre class="r"><code>eth_usd &lt;- tq_get(c(&quot;btcusd&quot;),
+       get    = &quot;tiingo.crypto&quot;,
+       from   = &quot;2021-09-01&quot;,
+       to     = &quot;2021-11-19&quot;)
+ #,resample_frequency = &quot;1day&quot;)
+eth_usd %&gt;% 
+  # change the date format to `Date` for geom_candlestick. 
+  mutate(date = as.Date(date)) %&gt;% 
+  ggplot(aes(x = date, y = close)) +
+    geom_candlestick(aes(open = open, high = high, low = low, close = close),
+                      colour_up = &quot;darkgreen&quot;, colour_down = &quot;darkred&quot;, 
+                      fill_up  = &quot;darkgreen&quot;, fill_down  = &quot;darkred&quot;)  +
+    labs(title = &quot;ETHUSD Candlestick Chart&quot;, y = &quot;Closing Price&quot;, x = &quot;&quot;) +
+    theme_tq()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>Pull AAPL stock price</p>
+<pre class="r"><code>AAPL &lt;- tq_get(&quot;AAPL&quot;, get = &quot;stock.prices&quot;, 
+               from = &quot;2021-09-01&quot;, to = &quot;2021-11-16&quot;)</code></pre>
+<pre><code>## Warning: `type_convert()` only converts columns of type &#39;character&#39;.
+## - `df` has no columns of type &#39;character&#39;</code></pre>
+<pre class="r"><code>AAPL %&gt;%
+    ggplot(aes(x = date, y = close)) +
+    geom_candlestick(aes(open = open, high = high, low = low, close = close),
+                        colour_up = &quot;darkgreen&quot;, colour_down = &quot;darkred&quot;, 
+                        fill_up  = &quot;darkgreen&quot;, fill_down  = &quot;darkred&quot;, 
+                     size = 1) +
+    labs(title = &quot;AAPL Candlestick Chart&quot;, 
+         subtitle = &quot;Zoomed in, Experimenting with Formatting&quot;,
+         y = &quot;Closing Price&quot;, x = &quot;&quot;) + 
+    coord_x_date(xlim = c(end - weeks(6), end),
+                 ylim = c(130, 160)) + 
+    theme_tq()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 </div>
