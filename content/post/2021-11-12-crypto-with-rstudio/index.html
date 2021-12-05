@@ -144,20 +144,20 @@ coin_hist2 %&gt;%
 <p>Last and least, one can get information on exchanges. For this download a list of active/inactive/untracked exchanges using exchange_list():</p>
 <pre class="r"><code>exchanges &lt;- exchange_list(only_active=TRUE)
 exchanges</code></pre>
-<pre><code>## # A tibble: 431 × 6
+<pre><code>## # A tibble: 438 × 6
 ##       id name         slug         is_active first_historical_… last_historical…
 ##    &lt;int&gt; &lt;chr&gt;        &lt;chr&gt;            &lt;int&gt; &lt;date&gt;             &lt;date&gt;          
-##  1    16 Poloniex     poloniex             1 2018-04-26         2021-11-21      
-##  2    22 Bittrex      bittrex              1 2018-04-26         2021-11-21      
-##  3    24 Kraken       kraken               1 2018-04-26         2021-11-21      
+##  1    16 Poloniex     poloniex             1 2018-04-26         2021-12-05      
+##  2    22 Bittrex      bittrex              1 2018-04-26         2021-12-05      
+##  3    24 Kraken       kraken               1 2018-04-26         2021-12-05      
 ##  4    32 Bleutrade    bleutrade            1 2018-04-26         2021-10-04      
-##  5    34 Bittylicious bittylicious         1 2018-04-26         2021-11-21      
-##  6    36 CEX.IO       cex-io               1 2018-04-26         2021-11-21      
-##  7    37 Bitfinex     bitfinex             1 2018-04-26         2021-11-21      
-##  8    42 HitBTC       hitbtc               1 2018-04-26         2021-11-21      
-##  9    50 EXMO         exmo                 1 2018-04-26         2021-11-21      
-## 10    61 Okcoin       okcoin               1 2018-04-26         2021-11-21      
-## # … with 421 more rows</code></pre>
+##  5    34 Bittylicious bittylicious         1 2018-04-26         2021-12-05      
+##  6    36 CEX.IO       cex-io               1 2018-04-26         2021-12-05      
+##  7    37 Bitfinex     bitfinex             1 2018-04-26         2021-12-05      
+##  8    42 HitBTC       hitbtc               1 2018-04-26         2021-12-05      
+##  9    50 EXMO         exmo                 1 2018-04-26         2021-12-05      
+## 10    61 Okcoin       okcoin               1 2018-04-26         2021-12-05      
+## # … with 428 more rows</code></pre>
 <p>and then download information on “binance” and “kraken”:</p>
 <pre class="r"><code>ex_info &lt;- exchange_info(exchanges %&gt;% 
                            filter(slug %in% c(&#39;binance&#39;,&#39;kraken&#39;)))</code></pre>
@@ -188,8 +188,8 @@ exchanges</code></pre>
 <pre><code>## # A tibble: 2 × 2
 ##   spot_volume_usd spot_volume_last_updated
 ##             &lt;dbl&gt; &lt;dttm&gt;                  
-## 1      760770042. 2021-11-21 07:40:15     
-## 2    31807220533. 2021-11-21 07:40:15</code></pre>
+## 1     3476787278. 2021-12-05 01:50:15     
+## 2    56692463948. 2021-12-05 01:50:15</code></pre>
 </div>
 <div id="tidyquant" class="section level1">
 <h1>Tidyquant</h1>
@@ -226,15 +226,14 @@ exchanges</code></pre>
 <pre><code>## ══ Need to Learn tidyquant? ════════════════════════════════════════════════════
 ## Business Science offers a 1-hour course - Learning Lab #9: Performance Analysis &amp; Portfolio Optimization with tidyquant!
 ## &lt;/&gt; Learn more at: https://university.business-science.io/p/learning-labs-pro &lt;/&gt;</code></pre>
-<pre class="r"><code>tiingo_api_key(&#39;86771cb62164b5be7a3cbb13db57cf4c8ac4e251&#39;)</code></pre>
 <pre><code>## Token has been set for this R session only. It is recommended to instead set the `RIINGO_TOKEN` environment variable in an `.Renviron` file using `usethis::edit_r_environ()`, and then restart R.</code></pre>
 <p>Candlestick Chart</p>
 <pre class="r"><code>end = ymd(20211115)
 # Tiingo Bitcoin in USD ----
 btc_usd &lt;- tq_get(c(&quot;btcusd&quot;),
        get    = &quot;tiingo.crypto&quot;,
-       from   = &quot;2021-09-01&quot;,
-       to     = &quot;2021-11-19&quot;)
+       from   = &quot;2020-01-01&quot;,
+       to     = &quot;2021-12-03&quot;)
  #,resample_frequency = &quot;1day&quot;)
 btc_usd %&gt;% 
   # change the date format to `Date` for geom_candlestick. 
@@ -245,11 +244,11 @@ btc_usd %&gt;%
                       fill_up  = &quot;darkgreen&quot;, fill_down  = &quot;darkred&quot;)  +
     labs(title = &quot;BTCUSD Candlestick Chart&quot;, y = &quot;Closing Price&quot;, x = &quot;&quot;) +
     theme_tq()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
-<pre class="r"><code>eth_usd &lt;- tq_get(c(&quot;btcusd&quot;),
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<pre class="r"><code>eth_usd &lt;- tq_get(c(&quot;ethusd&quot;),
        get    = &quot;tiingo.crypto&quot;,
        from   = &quot;2021-09-01&quot;,
-       to     = &quot;2021-11-19&quot;)
+       to     = &quot;2021-12-03&quot;)
  #,resample_frequency = &quot;1day&quot;)
 eth_usd %&gt;% 
   # change the date format to `Date` for geom_candlestick. 
@@ -260,7 +259,7 @@ eth_usd %&gt;%
                       fill_up  = &quot;darkgreen&quot;, fill_down  = &quot;darkred&quot;)  +
     labs(title = &quot;ETHUSD Candlestick Chart&quot;, y = &quot;Closing Price&quot;, x = &quot;&quot;) +
     theme_tq()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
 <p>Pull AAPL stock price</p>
 <pre class="r"><code>AAPL &lt;- tq_get(&quot;AAPL&quot;, get = &quot;stock.prices&quot;, 
                from = &quot;2021-09-01&quot;, to = &quot;2021-11-16&quot;)</code></pre>
@@ -278,5 +277,24 @@ eth_usd %&gt;%
     coord_x_date(xlim = c(end - weeks(6), end),
                  ylim = c(130, 160)) + 
     theme_tq()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<pre class="r"><code>eth_daily_log_returns &lt;- eth_usd %&gt;%
+    tq_transmute(select     = close, 
+                 mutate_fun = periodReturn, 
+                 period     = &quot;daily&quot;, 
+                 type       = &quot;log&quot;,
+                 col_rename = &quot;daily.returns&quot;)</code></pre>
+<pre><code>## Warning: `type_convert()` only converts columns of type &#39;character&#39;.
+## - `df` has no columns of type &#39;character&#39;</code></pre>
+<pre class="r"><code>eth_daily_log_returns %&gt;% 
+  mutate(pos = daily.returns &gt; 0 ) %&gt;% 
+  ggplot(aes(x = date, y = daily.returns, fill = pos)) + 
+    geom_col(position = &quot;identity&quot;,  size = 0.25) +
+    scale_fill_manual(values = c(&quot;#FFDDDD&quot;, &quot;#CCEEFF&quot;), guide = &quot;none&quot;) +
+    theme_bw()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<pre class="r"><code>eth_daily_log_returns %&gt;% 
+  ggplot(aes(x = date, y = daily.returns)) +
+  geom_barchart(aes(open = 0, high = daily.returns, low = 0, close = daily.returns))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
 </div>
