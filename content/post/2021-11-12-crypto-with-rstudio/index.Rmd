@@ -12,7 +12,7 @@ tags:
 
 # Crypto2
 Package `crypto2`  retrieves crypto currency information and historical prices as well as information on the exchanges they are listed on from (CoinMarketCap)<https://coinmarketcap.com> via their 'web-api'.
-```{r}
+```{r, warning=FALSE, message=FALSE}
 library(crypto2)
 library(tidyverse)
 
@@ -84,7 +84,7 @@ ex_info %>%
 
 # Tidyquant
 
-```{r}
+```{r message=FALSE}
 library(tidyquant)
 ```
 ```{r echo=FALSE}
@@ -150,6 +150,7 @@ AAPL %>%
                  ylim = c(130, 160)) + 
     theme_tq()
 ```
+We can create the Daily log return chart.
 ```{r}
 eth_daily_log_returns <- eth_usd %>%
     tq_transmute(select     = close, 
@@ -165,6 +166,7 @@ eth_daily_log_returns %>%
     scale_fill_manual(values = c("#FFDDDD", "#CCEEFF"), guide = "none") +
     theme_bw()
 ```
+Or, use the `tidyquant::geom_barchart`:
 ```{r}
 eth_daily_log_returns %>% 
   ggplot(aes(x = date, y = daily.returns)) +

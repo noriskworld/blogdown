@@ -17,21 +17,12 @@ tags:
 <h1>Crypto2</h1>
 <p>Package <code>crypto2</code> retrieves crypto currency information and historical prices as well as information on the exchanges they are listed on from (CoinMarketCap)<a href="https://coinmarketcap.com" class="uri">https://coinmarketcap.com</a> via their ‘web-api’.</p>
 <pre class="r"><code>library(crypto2)
-library(tidyverse)</code></pre>
-<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
-<pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
-## ✓ tibble  3.1.6     ✓ dplyr   1.0.7
-## ✓ tidyr   1.1.4     ✓ stringr 1.4.0
-## ✓ readr   2.1.0     ✓ forcats 0.5.1</code></pre>
-<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-## x dplyr::filter() masks stats::filter()
-## x dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code>coins &lt;- crypto_list(only_active=TRUE)
+library(tidyverse)
+
+coins &lt;- crypto_list(only_active=TRUE)
 coin_info &lt;- crypto_info(coins,limit=3)</code></pre>
-<pre><code>## &gt; Scraping crypto info</code></pre>
-<pre><code>## </code></pre>
-<pre><code>## &gt; Processing historical crypto data</code></pre>
-<pre><code>## </code></pre>
+<pre><code>## &gt; Scraping crypto info
+## &gt; Processing historical crypto data</code></pre>
 <pre class="r"><code>coin_info</code></pre>
 <pre><code>## # A tibble: 3 × 19
 ##      id name     symbol category description     slug   logo    subreddit notice
@@ -188,44 +179,12 @@ exchanges</code></pre>
 <pre><code>## # A tibble: 2 × 2
 ##   spot_volume_usd spot_volume_last_updated
 ##             &lt;dbl&gt; &lt;dttm&gt;                  
-## 1     3476787278. 2021-12-05 01:50:15     
-## 2    56692463948. 2021-12-05 01:50:15</code></pre>
+## 1     3478524905. 2021-12-05 01:55:15     
+## 2    56746762707. 2021-12-05 01:55:15</code></pre>
 </div>
 <div id="tidyquant" class="section level1">
 <h1>Tidyquant</h1>
 <pre class="r"><code>library(tidyquant)</code></pre>
-<pre><code>## Loading required package: lubridate</code></pre>
-<pre><code>## 
-## Attaching package: &#39;lubridate&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     date, intersect, setdiff, union</code></pre>
-<pre><code>## Loading required package: PerformanceAnalytics</code></pre>
-<pre><code>## Loading required package: xts</code></pre>
-<pre><code>## Loading required package: zoo</code></pre>
-<pre><code>## 
-## Attaching package: &#39;zoo&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     as.Date, as.Date.numeric</code></pre>
-<pre><code>## 
-## Attaching package: &#39;xts&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:dplyr&#39;:
-## 
-##     first, last</code></pre>
-<pre><code>## 
-## Attaching package: &#39;PerformanceAnalytics&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:graphics&#39;:
-## 
-##     legend</code></pre>
-<pre><code>## Loading required package: quantmod</code></pre>
-<pre><code>## Loading required package: TTR</code></pre>
-<pre><code>## Registered S3 method overwritten by &#39;quantmod&#39;:
-##   method            from
-##   as.zoo.data.frame zoo</code></pre>
-<pre><code>## ══ Need to Learn tidyquant? ════════════════════════════════════════════════════
-## Business Science offers a 1-hour course - Learning Lab #9: Performance Analysis &amp; Portfolio Optimization with tidyquant!
-## &lt;/&gt; Learn more at: https://university.business-science.io/p/learning-labs-pro &lt;/&gt;</code></pre>
 <pre><code>## Token has been set for this R session only. It is recommended to instead set the `RIINGO_TOKEN` environment variable in an `.Renviron` file using `usethis::edit_r_environ()`, and then restart R.</code></pre>
 <p>Candlestick Chart</p>
 <pre class="r"><code>end = ymd(20211115)
@@ -277,7 +236,8 @@ eth_usd %&gt;%
     coord_x_date(xlim = c(end - weeks(6), end),
                  ylim = c(130, 160)) + 
     theme_tq()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-16-1.png" width="672" />
+We can create the Daily log return chart.</p>
 <pre class="r"><code>eth_daily_log_returns &lt;- eth_usd %&gt;%
     tq_transmute(select     = close, 
                  mutate_fun = periodReturn, 
@@ -292,7 +252,8 @@ eth_usd %&gt;%
     geom_col(position = &quot;identity&quot;,  size = 0.25) +
     scale_fill_manual(values = c(&quot;#FFDDDD&quot;, &quot;#CCEEFF&quot;), guide = &quot;none&quot;) +
     theme_bw()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-17-1.png" width="672" />
+Or, use the <code>tidyquant::geom_barchart</code>:</p>
 <pre class="r"><code>eth_daily_log_returns %&gt;% 
   ggplot(aes(x = date, y = daily.returns)) +
   geom_barchart(aes(open = 0, high = daily.returns, low = 0, close = daily.returns))</code></pre>
