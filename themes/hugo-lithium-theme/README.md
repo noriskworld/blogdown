@@ -1,8 +1,46 @@
-# Notes to myself
+# Hugo Lithium
 
-> **I blog therefore I am.**
+A simple responsive blog theme for [Hugo](https://gohugo.io/).
 
-Reasons to blog:
+![Hugo Lithium Theme Screenshot](https://raw.githubusercontent.com/jrutheiser/hugo-lithium-theme/master/images/screenshot.png)
 
-1. The [**blogdown**](https://github.com/rstudio/blogdown) is too good to skip.
-1. I made a mistake, so I (or whoever stumble upon this) won't make it again.  
+## Features
+
+- Blog
+- Responsive
+- Disqus
+- Google Analytics
+
+## Installation
+
+Run the following inside your Hugo site folder:
+
+```
+$ mkdir themes
+$ cd themes
+$ git clone https://github.com/jrutheiser/hugo-lithium-theme
+```
+
+## Configuration
+
+Take a look at the sample [config.toml](https://github.com/jrutheiser/hugo-lithium-theme/blob/master/exampleSite/config.toml)
+file located in the [exampleSite](https://github.com/jrutheiser/hugo-lithium-theme/blob/master/exampleSite) folder.
+
+## Content Types
+
+### Post
+
+Used for blog posts.
+
+Run `hugo new post/<post-name>.md` to create a post.
+
+### Page
+
+Used for site pages.
+
+Run `hugo new page/<page-name>.md` to create a page.
+
+## License
+
+The code is available under the [MIT license](https://github.com/jrutheiser/hugo-lithium-theme/blob/master/LICENSE.md).
+

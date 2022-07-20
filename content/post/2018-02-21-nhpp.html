@@ -25,18 +25,30 @@ tags:
 <div id="power-law-nhpp-and-underlying-weibull" class="section level2">
 <h2>Power Law NHPP and Underlying Weibull</h2>
 <p>The NHPP model is has a model for minimal repair, where the repair of a failed system is just enough to get the system operational again. In Power Law NHPP, the time to first failure follows the Weibull distribution, then each succeeding failure is governed by the model as in the case of minimal repair.</p>
-<p>For Power Law NHPP model, the expected number of failures in the first t hours, M(t), is: <span class="math display">\[E\left[ N(t) \right] =\lambda\cdot t^\beta\]</span> where <span class="math inline">\(\lambda,\beta&gt;0\)</span>. The probability that the number of failures, N(t), is: <span class="math display">\[Pr\left[ N \left( t \right)= n \right]=\frac{\left( \lambda \cdot t^\beta \right) \cdot e^{-\lambda \cdot t^\beta}} {n!}  ;n=0,1,2,...   \]</span></p>
-<p>The repair rate (or ROCOF) for this model is <span class="math display">\[ m(t)=\lambda\cdot \beta \cdot t^{\beta−1}\]</span> where <span class="math inline">\(\lambda&gt;0,\beta &gt; 0\)</span>.</p>
-<p>For a Power Law NHPP process, the time to the first fail follows a Weibull distribution with shape parameter <span class="math inline">\(\beta\)</span> and characteristic life <span class="math inline">\(\eta=\left( \lambda \right) ^ {- \frac {1} {\beta}}\)</span>. The accumulated Hazard function: <span class="math display">\[H\left(t \right)=\lambda\cdot t^\beta\]</span> Culmative Distribution Function <span class="math display">\[F\left( t \right) = 1-e^{-\lambda \cdot t^\beta}\]</span></p>
+<p>For Power Law NHPP model, the expected number of failures in the first t hours, M(t), is:
+<span class="math display">\[E\left[ N(t) \right] =\lambda\cdot t^\beta\]</span>
+where <span class="math inline">\(\lambda,\beta&gt;0\)</span>.
+The probability that the number of failures, N(t), is:
+<span class="math display">\[Pr\left[ N \left( t \right)= n \right]=\frac{\left( \lambda \cdot t^\beta \right) \cdot e^{-\lambda \cdot t^\beta}} {n!}  ;n=0,1,2,...   \]</span></p>
+<p>The repair rate (or ROCOF) for this model is
+<span class="math display">\[ m(t)=\lambda\cdot \beta \cdot t^{\beta−1}\]</span>
+where <span class="math inline">\(\lambda&gt;0,\beta &gt; 0\)</span>.</p>
+<p>For a Power Law NHPP process, the time to the first fail follows a Weibull distribution with shape parameter <span class="math inline">\(\beta\)</span> and characteristic life <span class="math inline">\(\eta=\left( \lambda \right) ^ {- \frac {1} {\beta}}\)</span>. The accumulated Hazard function:
+<span class="math display">\[H\left(t \right)=\lambda\cdot t^\beta\]</span>
+Culmative Distribution Function
+<span class="math display">\[F\left( t \right) = 1-e^{-\lambda \cdot t^\beta}\]</span></p>
 <p>Other names for the Power Law model are: the <strong>Duane Model</strong> and the <strong>AMSAA model</strong>. AMSAA stands for the United States Army Materials System Analysis Activity, where much theoretical work describing the Power Law model was performed in the 1970’s.</p>
 </div>
 <div id="nhpp-and-the-underlying-weibull-time-to-failure" class="section level2">
 <h2>NHPP and the Underlying Weibull time-to-failure</h2>
-<p>The reliability function always follows <span class="math display">\[R\left( t \right)=1-F\left( t \right) = e^{-H\left( t \right)}\]</span> and <span class="math display">\[ H\left( t \right) = -\ln\left[ R\left( t \right) \right]=-\ln \left[ 1-F\left( t \right) \right]\]</span></p>
+<p>The reliability function always follows
+<span class="math display">\[R\left( t \right)=1-F\left( t \right) = e^{-H\left( t \right)}\]</span>
+and
+<span class="math display">\[ H\left( t \right) = -\ln\left[ R\left( t \right) \right]=-\ln \left[ 1-F\left( t \right) \right]\]</span></p>
 <div id="as-bad-as-old" class="section level3">
 <h3>As bad as old</h3>
 <div class="figure">
-<img src="type_of_repairs.png" alt="types_of_repairs" />
+<img src="type_of_repairs.png" alt="" />
 <p class="caption">types_of_repairs</p>
 </div>
 </div>
