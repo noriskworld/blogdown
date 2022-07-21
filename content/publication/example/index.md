@@ -1,36 +1,21 @@
 ---
-abstract: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis posuere tellus
-  ac convallis placerat. Proin tincidunt magna sed ex sollicitudin condimentum. Sed
-  ac faucibus dolor, scelerisque sollicitudin nisi. Cras purus urna, suscipit quis
-  sapien eu, pulvinar tempor diam. Quisque risus orci, mollis id ante sit amet, gravida
-  egestas nisl. Sed ac tempus magna. Proin in dui enim. Donec condimentum, sem id
-  dapibus fringilla, tellus enim condimentum arcu, nec volutpat est felis vel metus.
-  Vestibulum sit amet erat at nulla eleifend gravida.
-author_notes:
-- Equal contribution
-- Equal contribution
+abstract: Probabilistic risk assessment (PRA) is a systematic process of examining how engineered systems work to ensure safety. With the growth of the size of dynamic systems and the complexity of the interactions between hardware, software, and humans, it is extremely difficult to enumerate risky scenarios by the traditional PRA methods. In this study, a new dynamic probabilistic risk assessment methodology is proposed that employs a new exploration strategy to generate risky scenarios. The proposed methodology consists of three main modules, including simulation, planner, and scheduler. In this methodology, the engineering knowledge of the system is explicitly used to guide the simulation module to achieve higher efficiency and accuracy. The engineering knowledge is reflected in the planner module which is responsible for generating plans as a high-level map to guide the simulation. The scheduler module is responsible for guiding the simulation by controlling the timing and occurrence of the random events. In this paper, modules of the proposed methodology, and their interactions are explained in detail. The developed methodology is used to perform risk assessment of a Space Shuttle ascent phase, and results show the effectiveness of the proposed platform..
 authors:
 - admin
-- Robert Ford
-date: "2013-07-01T00:00:00Z"
-doi: ""
+- Tarannom Parhizkar
+- Ali Mosleh
+date: "2022-01-01T00:00:00Z"
+doi: "https://doi.org/10.1016/j.ress.2021.108047"
 featured: true
-image:
-  caption: 'Image credit: [**Unsplash**](https://unsplash.com/photos/pLCdAaMFLTE)'
-  focal_point: ""
-  preview_only: false
-projects:
-- example
-publication: In *Wowchemy Conference*
-publication_short: In *ICW*
+publication: IIn *Reliability Engineering & System Safety*
+publication_short: In *RESS*
 publication_types:
-- "1"
-publishDate: "2017-01-01T00:00:00Z"
+- "2"
+publishDate: "2022-01-01T00:00:00Z"
 slides: example
-summary: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis posuere tellus
-  ac convallis placerat. Proin tincidunt magna sed ex sollicitudin condimentum.
+summary: 
 tags: []
-title: An example conference paper
+title: "Guided simulation for dynamic probabilistic risk assessment of complex systems: Concept, method, and application"
 url_code: ""
 url_dataset: ""
 url_pdf: ""
