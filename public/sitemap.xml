@@ -10,9 +10,27 @@
   <url>
     <loc>/</loc><lastmod>2030-06-01T13:00:00+00:00</lastmod><changefreq>weekly</changefreq></url>
   <url>
+    <loc>/categories/</loc><lastmod>2022-07-22T21:29:30-07:00</lastmod><changefreq>weekly</changefreq></url>
+  <url>
     <loc>/post/daily-stoic/</loc><lastmod>2022-07-22T20:48:41-07:00</lastmod><changefreq>weekly</changefreq></url>
   <url>
-    <loc>/post/</loc><lastmod>2022-07-22T20:48:41-07:00</lastmod><changefreq>weekly</changefreq></url>
+    <loc>/tag/des/</loc><lastmod>2022-07-22T21:29:30-07:00</lastmod><changefreq>weekly</changefreq></url>
+  <url>
+    <loc>/post/discrete-event-simulation/</loc><lastmod>2022-07-22T21:29:30-07:00</lastmod><changefreq>weekly</changefreq></url>
+  <url>
+    <loc>/post/</loc><lastmod>2022-07-22T21:29:30-07:00</lastmod><changefreq>weekly</changefreq></url>
+  <url>
+    <loc>/tag/python/</loc><lastmod>2022-07-22T21:29:30-07:00</lastmod><changefreq>weekly</changefreq></url>
+  <url>
+    <loc>/category/reliability/</loc><lastmod>2022-07-22T21:29:30-07:00</lastmod><changefreq>weekly</changefreq></url>
+  <url>
+    <loc>/tag/repairable/</loc><lastmod>2022-07-22T21:29:30-07:00</lastmod><changefreq>weekly</changefreq></url>
+  <url>
+    <loc>/tag/rstats/</loc><lastmod>2022-07-22T21:29:30-07:00</lastmod><changefreq>weekly</changefreq></url>
+  <url>
+    <loc>/category/simulation/</loc><lastmod>2022-07-22T21:29:30-07:00</lastmod><changefreq>weekly</changefreq></url>
+  <url>
+    <loc>/tags/</loc><lastmod>2022-07-22T21:29:30-07:00</lastmod><changefreq>weekly</changefreq></url>
   <url>
     <loc>/post/repairable-systems-and-nhpp/</loc><lastmod>2022-07-21T00:33:07-07:00</lastmod><changefreq>weekly</changefreq></url>
   <url>
@@ -40,8 +58,4 @@
   <url>
     <loc>/project/example/</loc><lastmod>2016-04-27T00:00:00+00:00</lastmod><changefreq>weekly</changefreq></url>
   <url>
-    <loc>/project/</loc><lastmod>2016-04-27T00:00:00+00:00</lastmod><changefreq>weekly</changefreq></url>
-  <url>
-    <loc>/tags/</loc><lastmod>2016-04-27T00:00:00+00:00</lastmod><changefreq>weekly</changefreq></url>
-  <url>
-    <loc>/categories/</loc><changefreq>weekly</changefreq></url></urlset>
+    <loc>/project/</loc><lastmod>2016-04-27T00:00:00+00:00</lastmod><changefreq>weekly</changefreq></url></urlset>

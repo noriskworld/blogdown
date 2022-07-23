@@ -61,7 +61,7 @@ The fonts on the back is too small to read, but overall the build quality is goo
 
 > Remember that you are an actor in a play. For that is your business, to act the role that is assigned to you as well as you can.  - Epicletus.
 
-## #TEMET NOSCE
+### TEMET NOSCE
 
 > To know thyself is the beginning of wisdom.  -Aristotle
 
