@@ -38,35 +38,35 @@ The fonts on the back is too small to read, but overall the build quality is goo
 
 ### MEMENTO MORI
 
-> Do not act as if you had thousands of years to live. The unavoidable hangs above your head. While you have life in you, while you sill can, make yourself good. - Marcus Aurelius
+> Do not act as if you had thousands of years to live. The unavoidable hangs above your head. While you have life in you, while you sill can, make yourself good.  -Marcus Aurelius
 
-> Remember death: To say this to tell a person to remember their freedom - Sensca,
+> Remember death: To say this to tell a person to remember their freedom. -Sensca,
 
 
-> Act as if you have already died and what is left is now a gift. Now go live the rest properly - Marcus Aurelius,
+> Act as if you have already died and what is left is now a gift. Now go live the rest properly.  - Marcus Aurelius
 
 ### PREMEDITATIO MALORUM
 
-> Everyone faces up more bravely to a thing for which he has long prepared himself, suffering can be withstood if they have been trained for in advance. -Seneca
+> Everyone faces up more bravely to a thing for which he has long prepared himself, suffering can be withstood if they have been trained for in advance.  -Seneca
 
-> If you wart a person to keep his head when a crisis comes you must give them training before it comes. - Seneca
+> If you wart a person to keep his head when a crisis comes you must give them training before it comes.  -Seneca
 
-> All our human lot should be before our eyes. -Seneca
+> All our human lot should be before our eyes.  -Seneca
 
 ### AMOR FATT
 
-> The spirit must Be trainad to a realisation and an acceptance of its lot. - Seneca
+> The spirit must Be trainad to a realisation and an acceptance of its lot.  -Seneca
 
-> What fortune has made is not your own. -Seneca
+> What fortune has made is not your own.  -Seneca
 
-> Remember that you are an actor in a play. For that is your business, to act the role that is assigned to you as well as you can - Epicletus.
+> Remember that you are an actor in a play. For that is your business, to act the role that is assigned to you as well as you can.  - Epicletus.
 
 ## #TEMET NOSCE
 
 > To know thyself is the beginning of wisdom.  -Aristotle
 
-> The unexamined life is not worth living. -Socrates,
+> The unexamined life is not worth living.  -Socrates,
 
-> To find yourself, think for yeurself. -Socrates,
+> To find yourself, think for yeurself.  -Socrates,
 
-> Dig within. Therein lies the fountain of good. -Marcus Aurelius.
+> Dig within. Therein lies the fountain of good.  -Marcus Aurelius.
