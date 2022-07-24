@@ -55,7 +55,7 @@ The fonts on the back is too small to read, but overall the build quality is goo
 
 ### AMOR FATI
 
-> The spirit must Be trainad to a realisation and an acceptance of its lot.  -Seneca
+> The spirit must be trainad to a realisation and an acceptance of its lot.  -Seneca
 
 > What fortune has made is not your own.  -Seneca
 

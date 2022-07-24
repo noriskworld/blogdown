@@ -32,14 +32,12 @@ library(intervals)
 ```
 ## Simmer for R
 
-R is my language of choice. Sorry, Python, I love you too, but life is too short to have two favorite languages. 
-
 In my short experiment with Simpy and Simmer, Simmer shines in one area: monitoring. 
-In Simpy a list can be past to the simulation, and it is flexible to choose what to code. 
+In Simpy a list can be passed to the simulation, and it is flexible to choose what to code. 
 
-With Simmer, three commands `get_mon_arrivals(), get_mon_attributes(), get_mon_resources()` can generate the story book of the simulation. The story is in data.frame format, and can be easily processed in R. 
+With Simmer, three commands `get_mon_arrivals()`, `get_mon_attributes()`, `get_mon_resources()` can generate the story book of the simulation. The story is in data.frame format, and can be easily processed in R. 
 
-Let's use the Machie Shop as an Example. 
+Let's use the Machine Shop as an Example. 
 
 Instead of print out the events in user interface with `log_()`, we make the simulation `invisible`, and add an attribute to log the state (working, fail). 
 
@@ -84,7 +82,7 @@ simmer_relia <- function(sim_time, mon_ = "attributes") {
 
 ```
 
-## Loop for replications
+### Loop for replications
 ```{r}
 N_RUN <-  10
 SIM_END = 500
@@ -115,7 +113,7 @@ The attribute logs the state of all the "machines", it is more flexible to use t
 
 In the example above, we have the event sequence of the machine_a and machine_b, so for a parellel system, the intersection of downtime interval is the system down time. and for a series system, union. 
 
-## Convert event sequences to state intervals
+### Convert event sequences to state intervals
 
 ```{r}
 machine_state_interval <- function(machine_state_log){
@@ -139,7 +137,7 @@ machine_down_interval <- function(state_interval, i, machine_name){
 } 
 ```
 
-## parallel -> intersection of the interval
+### parallel -> intersection of the interval
 
 ```{r}
 parallel_down_log <- tibble(start_time = as.numeric(), end_time = as.numeric(), i_run = as.integer())
@@ -159,7 +157,7 @@ names(parallel_down_log) <- c("start", "end", "i_run")
 print(parallel_down_log)
 ```
 
-## Series -> union of the interval 
+### Series -> union of the interval 
 
 ```{r}
 series_down_log <- tibble(start_time = as.numeric(), end_time = as.numeric(), i_run = as.integer())
