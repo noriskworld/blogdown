@@ -75,14 +75,14 @@ In excel, $\beta$ is scale, and $\alpha$ is shape.
 Also, important to note that in Excel function call, only order matters, and you cannot force call by argument as in R.
 
 ### The Upstart
-Welcome to R, the favorite kid on the block.
+Welcome to R
 
 ```
 The Weibull distribution with shape parameter a and scale parameter b has density given by
 f(x) = (a/b) (x/b)^(a-1) exp(- (x/b)^a)
 for x > 0. The cumulative distribution function is F(x) = 1 - exp(- (x/b)^a) on x > 0
 ```
-So, a is shape, or $\alpha$, b is scale, or $\beta$, as in Excel, not Nelson. 
+So, a is shape, or $\alpha$. And b is scale, or $\beta$, as in Excel, not Nelson. 
 When calling function with argument, as most do in R, it is less confusing. 
 
 Shape = 1 means constant as in most implementations, and scale is the characteristic life. 
@@ -93,6 +93,15 @@ plot(t, pweibull(t, shape = 1, scale = 500))
 
 ```
 
+And `python`
+See the doc from [numpy](https://numpy.org/doc/stable/reference/random/generated/numpy.random.weibull.html):
+
+The probability density for the Weibull distribution is
+$$p\left(x\right)=\frac{a}{\lambda}\cdot \left(\frac{x}{\lambda}\right)^{a-1}\cdot e^{-\left(x/b\right)^a}$$
+where $a$ is the shape and $\lambda$ the scale.
+
+Same equation as `r`, except $\lambda$ is in the place of $b$.
+
 ## JMP
 I love JMP. Not the software, I have not used for long enough to form an opinion. I love the [help](http://www.jmp.com/support/help/Survival_Platform_Options.shtml#221381).
 
@@ -101,16 +110,16 @@ I love JMP. Not the software, I have not used for long enough to form an opinion
 Various Weibull Parameters in Terms of JMP’s alpha and beta
 
 | JMP Weibull | alpha | beta |
-| --- | --- | --- |
+| :--- |:---: | :---: |
 | Wayne Nelson | alpha=alpha | beta=beta |
-Meeker and Escobar | eta=alpha | beta=beta |
-Tobias and Trindade|c = alpha|m = beta
-Kececioglu|eta=alpha|beta=beta|
-Hosmer and Lemeshow|exp(X beta)=alpha|lambda=beta
-Blishke and Murthy|beta=alpha|alpha=beta
-Kalbfleisch and Prentice|lambda = 1/alpha|p = beta
-JMP Extreme Value|lambda=log(alpha)|delta=1/beta
-Meeker and Escobar s.e.v.|mu=log(alpha)|sigma=1/beta
+|Meeker and Escobar | eta=alpha | beta=beta |
+|Tobias and Trindade|c = alpha|m = beta|
+|Kececioglu|eta=alpha|beta=beta|
+|Hosmer and Lemeshow|exp(X beta)=alpha|lambda=beta|
+|Blishke and Murthy|beta=alpha|alpha=beta|
+|Kalbfleisch and Prentice|lambda = 1/alpha|p = beta|
+|JMP Extreme Value|lambda=log(alpha)|delta=1/beta|
+|Meeker and Escobar|mu=log(alpha)|sigma=1/beta|
 
 ## Final Thoughts
 Weibull distribution is used widely in engineering, biostatistics and other areas. The paramenterization has many ways. The most common used in engineering is the convention used in Nelson or Meeker. The shape factor is the characteristic life, called $\alpha$ or $\eta$, and shape factor $\beta$. 
