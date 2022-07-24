@@ -21,7 +21,7 @@ Just received my Stoic Bullion from Esty.
 
 ![Stoic Bullion](https://i.etsystatic.com/21074444/r/il/5b8350/3431180193/il_1588xN.3431180193_mo4t.jpg)
 
-The fonts on the back is too small to read, but overall the build quality is good. It is creadit card size. I will see how it will help. 
+The fonts on the back is too small to read, but overall the build quality is good. It is creadit card size, and fits in my wallet. 
 
 ## Four Virtues
 
@@ -40,7 +40,7 @@ The fonts on the back is too small to read, but overall the build quality is goo
 
 > Do not act as if you had thousands of years to live. The unavoidable hangs above your head. While you have life in you, while you sill can, make yourself good.  -Marcus Aurelius
 
-> Remember death: To say this to tell a person to remember their freedom. -Sensca,
+> Remember death: To say this to tell a person to remember their freedom. -Sensca
 
 
 > Act as if you have already died and what is left is now a gift. Now go live the rest properly.  - Marcus Aurelius
@@ -53,20 +53,20 @@ The fonts on the back is too small to read, but overall the build quality is goo
 
 > All our human lot should be before our eyes.  -Seneca
 
-### AMOR FATT
+### AMOR FATI
 
 > The spirit must Be trainad to a realisation and an acceptance of its lot.  -Seneca
 
 > What fortune has made is not your own.  -Seneca
 
-> Remember that you are an actor in a play. For that is your business, to act the role that is assigned to you as well as you can.  - Epicletus.
+> Remember that you are an actor in a play. For that is your business, to act the role that is assigned to you as well as you can.  - Epicletus
 
 ### TEMET NOSCE
 
 > To know thyself is the beginning of wisdom.  -Aristotle
 
-> The unexamined life is not worth living.  -Socrates,
+> The unexamined life is not worth living.  -Socrates
 
-> To find yourself, think for yeurself.  -Socrates,
+> To find yourself, think for yeurself.  -Socrates
 
-> Dig within. Therein lies the fountain of good.  -Marcus Aurelius.
+> Dig within. Therein lies the fountain of good.  -Marcus Aurelius
