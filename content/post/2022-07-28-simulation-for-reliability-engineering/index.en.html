@@ -1,0 +1,165 @@
+---
+title: Simulation for Reliability Engineering
+author: YUNWEI HU
+date: '2022-07-28'
+slug: simulation-for-reliability-engineering
+categories:
+  - Reliability
+  - simulation
+tags:
+  - Repairable
+  - rstats
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2022-07-28T23:42:12-07:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+
+
+<p>Repost of old blog post.</p>
+<div id="simulation-of-repairable-systems" class="section level2">
+<h2>Simulation of Repairable Systems</h2>
+<p>First things first, this is not blog post. It is a summary of some codes I wrote a while back. Later similar efforts were continued in <a href="https://github.com/huyunwei/des">Python</a>.</p>
+<p>The objective to develop some Python DES tools for simple series/parallel systems, similar to the <a href="http://reliabilityanalyticstoolkit.appspot.com/discrete_event_simulation">Reliability Analytics Toolkit by Seymour Morris</a>. The pet project for this month :)</p>
+<div id="the-grp-model-for-parametric-recurrent-event-data-analysis" class="section level3">
+<h3>The GRP Model for Parametric Recurrent Event Data Analysis</h3>
+<p>We follow the convention in [Ref 1] (<a href="http://www.weibull.com/hotwire/issue59/relbasics59.htm" class="uri">http://www.weibull.com/hotwire/issue59/relbasics59.htm</a>). (Fix typo in type II eq.)</p>
+<blockquote>
+<p>In this model, the concept of virtual age is introduced. Denote by t1,t2,…,tn the successive failure times and let x1,x2,…,x3 represent the time between failures. Assume that after each event, actions are taken to improve the system performance. Let q be the action effectiveness factor. There are two GRP models. </br>
+- Type I: <span class="math inline">\(v_i = v_{i-1} + q \cdot x_i = q \cdot t_i\)</span> </br>
+- Type II: <span class="math inline">\(v_i = q \cdot (v_{i-1} + x_i )= \sum_{k=1}^i q^{i-k+1} \cdot x_k\)</span></br>
+where <span class="math inline">\(v_i\)</span> is the virtual age of the system right after the ith repair. The Type I model assumes that the $i^{th} repair cannot remove the damage incurred before the <span class="math inline">\(i^{th}\)</span> failure. It can only reduce the additional age <span class="math inline">\(x_i\)</span> to <span class="math inline">\(q \cdot x_i\)</span>. The Type II model assumes that at the <span class="math inline">\(i^{th}\)</span> repair, the virtual age has been accumulated to <span class="math inline">\(v_{i-1} + x_i\)</span>. The <span class="math inline">\(i^{th}\)</span> repair will remove the cumulative damage from both current and previous failures by reducing the virtual age to <span class="math inline">\(q \cdot (v_{i-1} + x_i )\)</span>.</p>
+</blockquote>
+</div>
+<div id="analytical-solution-and-simulation" class="section level3">
+<h3>Analytical solution and Simulation</h3>
+<p>There is no close form for the renewal function E(N(t)) of General Renewal Process , except for some special cases, such as where the q = 1 (as-bad-as-old, or NHPP) or q = 0 (as-good-as-new). Monte Carlo simulation can be used but it is desirable to find an approximation equation of renewal function for speed.</p>
+<div id="power-law-nhpp-as-bad-as-old" class="section level4">
+<h4>Power Law NHPP (as-bad-as-old)</h4>
+<p>The power law function is used to model the rate of recurrence, which is: <span class="math inline">\(\lambda(t) = \lambda\beta t^{\beta-1}\)</span></p>
+<p>The conditional pdf is <span class="math inline">\(f(t_i|t_{i-1}) = \lambda \beta (x_i + v_{i-1})^{\beta-1} \cdot e^{-\lambda[(x_i + v_{i-1})^\beta - V_{i-1}^\beta]}\)</span></p>
+<p>Comparing the ROCOF with Weibull hazard function, we can get: <span class="math inline">\(\lambda = \frac{1}{\eta^\beta}\)</span> or <span class="math inline">\(\eta = (\frac{1}{\lambda})^{\frac{1}{\beta}}\)</span></p>
+</div>
+</div>
+</div>
+<div id="test-the-simulation" class="section level2">
+<h2>Test the simulation</h2>
+<p>Test the simulation.
+- Matraix is much faster than data frame.</p>
+<div id="simgrp" class="section level3">
+<h3>simGRP</h3>
+<p>The simDRA function returns the data frame of the simulation results, given alpha, beta, q.</p>
+<pre class="r"><code>library(tidyverse)
+# Function to simulate the General Renewal Process
+# Input, Weibull(Scale and Shape)
+simGRP &lt;- function (scale, shape = 1, q = 1, n_sim = 1e4, n_failure = 25) {
+  ttf &lt;- matrix(NA, n_failure, n_sim )
+  
+  # generate time to 1st failure
+  ttf[1, ] &lt;- rweibull(n_sim, scale = scale, shape = shape)
+  v_time &lt;- ttf[1, ] * q
+  
+  # generating time to ith failure - inverse of conditional Weibull CDF
+  for (i in 2:n_failure) {
+    #  rand &lt;- runif(n_sim)
+    ttf[i, ] &lt;- scale *( ( (v_time/scale)^shape - log(1 - runif(n_sim)) )^(1 / shape)) - 
+      v_time + ttf[i-1, ]
+    v_time &lt;- q * ttf[ i, ]
+  }
+  
+  #Return data frame
+  ttf &lt;- tibble(time_to_f = as.vector(ttf), 
+                count_f = rep(1:n_failure, n_sim), 
+                simid = rep(1:n_sim, each = n_failure))
+}
+
+# start clock
+ptm &lt;- proc.time()
+ttf &lt;- simGRP( scale = 100, shape = 1, q = 0, n_sim = 1e6, n_failure = 25)
+proc.time() - ptm</code></pre>
+<pre><code>##    user  system elapsed 
+##   2.588   0.222   2.853</code></pre>
+</div>
+</div>
+<div id="data-analyis" class="section level2">
+<h2>Data analyis</h2>
+<div id="build-the-functions-for-data-analysis" class="section level3">
+<h3>Build the functions for Data Analysis</h3>
+<ul>
+<li>Expected Time to failure</li>
+<li>Pr(N = n, Time &lt; t)</li>
+<li>Pr(N &gt;= n, Time &lt; t)</li>
+<li>Expected N(t)</li>
+</ul>
+<pre class="r"><code>ttn &lt;- function (data) {
+  time_to_failure &lt;- ttf %&gt;%
+    group_by(count_f) %&gt;%
+    summarise(avg = mean(time_to_f))
+}
+
+
+cumprob &lt;- function( data, count_failure, time_p ) { 
+  dims &lt;- data %&gt;%
+  filter(count_f &gt;= count_failure &amp; time_to_f &lt; time_p) %&gt;%
+  dim()
+  dims[1]/dim(data)[1]}
+
+prob &lt;- function( data, count_failure, time_p ) { 
+  dims &lt;- data %&gt;%
+  filter(count_f == count_failure &amp; time_to_f &lt; time_p) %&gt;%
+  dim()
+  dims[1]/dim(data)[1]}
+
+prob(ttf, 3, 10000)</code></pre>
+<pre><code>## [1] 0.04</code></pre>
+<pre class="r"><code>cumprob(ttf, 3, 10000)</code></pre>
+<pre><code>## [1] 0.92</code></pre>
+<pre class="r"><code># verify cumprob
+cprob = 0
+for (i in 3:40){ cprob = cprob + prob(ttf, i, 10000)}
+cprob</code></pre>
+<pre><code>## [1] 0.92</code></pre>
+<pre class="r"><code># Expected N(t)
+E_Nt &lt;- function (data, t){
+  dims &lt;- data %&gt;%
+    filter(time_to_f &lt; t) %&gt;%
+    dim()
+  dims[1]/length(unique(data$simid))
+}</code></pre>
+</div>
+<div id="compare-expected-nt-with-expected-time-to-nth-failure" class="section level3">
+<h3>Compare “Expected N(t)” with Expected “Time to nth failure”</h3>
+<p>** “Time at which E[N(t)] = n” != Expected “Time to nth failure” **</p>
+<pre class="r"><code>time_to_nth &lt;- ttn(ttf)
+ent &lt;- sapply(as_vector(time_to_nth[,2]), function(x) E_Nt(ttf, x))
+# plot(1:25, ent)
+# abline(0,1)
+time_to_nth &lt;- tibble(count_f = c(1:25, ent), 
+                      time = as_vector(rep(time_to_nth[,2],2)),
+                      src = rep(c(&quot;ttf&quot;, &quot;ent&quot;), each = 25))
+ggplot(time_to_nth, aes(x = time, y = count_f)) + geom_point(aes(color = src))</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
+</div>
+<div id="discrete-event-simulation" class="section level2">
+<h2>Discrete Event Simulation</h2>
+<p>The Monte Carlo simulation discussd above is applicable to a single repairable block. The general renewal process also assumes minimal repair downtime. In plant reliability/availabilit analysis, we often deal with long outage time, planning resources etc. The Monte Carlo simulation as above cannot answer those questions.</p>
+<p>Discrete Event Simulation (DES) is a more likely tool to solve sunch problems.</p>
+<p>Reliability Block Diagram is often used as a graphical presentation of the Boolean logic of the system dependency i.e. the functioning state (i.e., success or failure) of the system in terms of the functioning states of its components. The commerical reliability software packages, such as Blocksim (R) from Reliasoft, extended the functionality of RBD. It not only calculates the Boolean logic and it also use it as graphic input for the simulation.</p>
+</div>
+<div id="reference" class="section level2">
+<h2>Reference</h2>
+<ol style="list-style-type: decimal">
+<li>RDA, Weibull++; <a href="http://www.weibull.com/hotwire/issue59/relbasics59.htm" class="uri">http://www.weibull.com/hotwire/issue59/relbasics59.htm</a></li>
+<li>Mark P. Kaminskiy and Vasiliy V. Krivtsov</li>
+<li>Saeed Maghsoodloo and Dilcu Helvaci, “Renewal and Renewal-Intensity Functions with Minimal Repair,” Journal of Quality and Reliability Engineering, vol. 2014, Article ID 857437, 10 pages, 2014. <a href="doi:10.1155/2014/857437" class="uri">doi:10.1155/2014/857437</a></li>
+<li>E. Smeitink and R. Dekker, “A simple approximation to the renewal function [reliability theory],” in IEEE Transactions on Reliability, vol. 39, no. 1, pp. 71-75, Apr 1990.</li>
+</ol>
+</div>

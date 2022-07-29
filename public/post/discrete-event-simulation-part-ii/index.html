@@ -1,0 +1,1293 @@
+<!DOCTYPE html><html lang="en-us" >
+
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  
+  
+    <meta name="generator" content="Wowchemy 5.5.0 for Hugo" />
+  
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+  
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  
+
+  
+  
+  
+    
+      
+      <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto+Mono&family=Roboto:wght@400;700&display=swap">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto+Mono&family=Roboto:wght@400;700&display=swap" media="print" onload="this.media='all'">
+    
+  
+
+  
+  
+  
+  
+  
+    
+    
+    
+  
+  
+
+  <meta name="author" content="Yunwei Hu" />
+
+  
+  
+  
+    
+  
+  <meta name="description" content="This is a repost of the bolg by me dated 2018-05-21.
+#prepare the libraries library(tidyverse) library(simmer) library(simmer.plot) library(intervals) Simmer for R In my short experiment with Simpy and Simmer, Simmer shines in one area: monitoring." />
+
+  
+  <link rel="alternate" hreflang="en-us" href="/post/discrete-event-simulation-part-ii/" />
+
+  
+  
+  
+    <meta name="theme-color" content="#1565c0" />
+  
+
+  
+  
+    
+    <script src="/js/mathjax-config.js"></script>
+  
+
+  
+
+  <link rel="stylesheet" href="/css/vendor-bundle.min.c7b8d9abd591ba2253ea42747e3ac3f5.css" media="print" onload="this.media='all'">
+
+  
+  
+  
+    
+    
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/academicons@1.9.1/css/academicons.min.css" integrity="sha512-W0xM4mr6dEP9nREo7Z9z+9X70wytKvMGeDsj7ps2+xg5QPrEBXC8tAW1IFnzjR6eoJ90JmCnFzerQJTLzIEHjA==" crossorigin="anonymous" media="print" onload="this.media='all'">
+    
+
+    
+    
+    
+    
+      
+      
+    
+    
+    
+
+    
+    
+    
+      
+    
+    
+      
+      
+        
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/styles/github.min.css" crossorigin="anonymous" title="hl-light" media="print" onload="this.media='all'">
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/styles/dracula.min.css" crossorigin="anonymous" title="hl-dark" media="print" onload="this.media='all'" disabled>
+        
+      
+    
+
+    
+    
+    
+
+    
+
+    
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" integrity="" crossorigin="anonymous" async></script>
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+      
+      
+
+      
+      
+
+      
+    
+  
+
+  
+  
+  
+  
+  
+  <link rel="stylesheet" href="/css/wowchemy.1052fab8b7700a3dc49ee23683097d66.css" />
+
+  
+
+
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+  
+  
+
+  
+
+  
+    <link rel="manifest" href="/manifest.webmanifest" />
+  
+
+  <link rel="icon" type="image/png" href="/media/icon_hu22d83df22f4f441b6ca6bf11685edf8c_296566_32x32_fill_lanczos_center_3.png" />
+  <link rel="apple-touch-icon" type="image/png" href="/media/icon_hu22d83df22f4f441b6ca6bf11685edf8c_296566_180x180_fill_lanczos_center_3.png" />
+
+  <link rel="canonical" href="/post/discrete-event-simulation-part-ii/" />
+
+  
+  
+  
+  
+  
+  
+  
+  
+    
+    
+  
+  
+
+  
+  
+    
+    
+  
+  <meta property="twitter:card" content="summary" />
+  
+  <meta property="og:site_name" content="Risk Predictions" />
+  <meta property="og:url" content="/post/discrete-event-simulation-part-ii/" />
+  <meta property="og:title" content="Discrete Event Simulation - Part II | Risk Predictions" />
+  <meta property="og:description" content="This is a repost of the bolg by me dated 2018-05-21.
+#prepare the libraries library(tidyverse) library(simmer) library(simmer.plot) library(intervals) Simmer for R In my short experiment with Simpy and Simmer, Simmer shines in one area: monitoring." /><meta property="og:image" content="/media/icon_hu22d83df22f4f441b6ca6bf11685edf8c_296566_512x512_fill_lanczos_center_3.png" />
+    <meta property="twitter:image" content="/media/icon_hu22d83df22f4f441b6ca6bf11685edf8c_296566_512x512_fill_lanczos_center_3.png" /><meta property="og:locale" content="en-us" />
+  
+    
+      <meta
+        property="article:published_time"
+        content="2022-07-23T00:00:00&#43;00:00"
+      />
+    
+    <meta property="article:modified_time" content="2022-07-23T14:31:16-07:00">
+  
+
+  
+
+
+    
+
+
+
+
+
+
+  
+
+
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "/post/discrete-event-simulation-part-ii/"
+  },
+  "headline": "Discrete Event Simulation - Part II",
+  
+  "datePublished": "2022-07-23T00:00:00Z",
+  "dateModified": "2022-07-23T14:31:16-07:00",
+  
+  "author": {
+    "@type": "Person",
+    "name": "Yunwei Hu"
+  },
+  
+  "publisher": {
+    "@type": "Organization",
+    "name": "Risk Predictions",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "/media/icon_hu22d83df22f4f441b6ca6bf11685edf8c_296566_192x192_fill_lanczos_center_3.png"
+    }
+  },
+  "description": "This is a repost of the bolg by me dated 2018-05-21.\n#prepare the libraries library(tidyverse) library(simmer) library(simmer.plot) library(intervals) Simmer for R In my short experiment with Simpy and Simmer, Simmer shines in one area: monitoring."
+}
+</script>
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+
+  <title>Discrete Event Simulation - Part II | Risk Predictions</title>
+</head>
+
+
+<body id="top" data-spy="scroll" data-offset="70" data-target="#TableOfContents" class="page-wrapper   " data-wc-page-id="ff303710793249ba3946a9845889c502" >
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <script src="/js/wowchemy-init.min.2ed908358299dd7ab553faae685c746c.js"></script>
+
+  
+
+
+<aside class="search-modal" id="search">
+  <div class="container">
+    <section class="search-header">
+
+      <div class="row no-gutters justify-content-between mb-3">
+        <div class="col-6">
+          <h1>Search</h1>
+        </div>
+        <div class="col-6 col-search-close">
+          <a class="js-search" href="#" aria-label="Close"><i class="fas fa-times-circle text-muted" aria-hidden="true"></i></a>
+        </div>
+      </div>
+
+      <div id="search-box">
+        
+        <input name="q" id="search-query" placeholder="Search..." autocapitalize="off"
+        autocomplete="off" autocorrect="off" spellcheck="false" type="search" class="form-control"
+        aria-label="Search...">
+        
+      </div>
+
+      
+      
+
+      
+
+    </section>
+    <section class="section-search-results">
+
+      <div id="search-hits">
+        
+      </div>
+
+    </section>
+  </div>
+</aside>
+
+
+
+  <div class="page-header">
+    
+
+
+
+
+
+
+
+
+
+
+
+
+<header class="header--fixed">
+  <nav class="navbar navbar-expand-lg navbar-light compensate-for-scrollbar" id="navbar-main">
+    <div class="container-xl">
+
+      
+      <div class="d-none d-lg-inline-flex">
+        <a class="navbar-brand" href="/">Risk Predictions</a>
+      </div>
+      
+
+      
+      <button type="button" class="navbar-toggler" data-toggle="collapse"
+              data-target="#navbar-content" aria-controls="navbar-content" aria-expanded="false" aria-label="Toggle navigation">
+      <span><i class="fas fa-bars"></i></span>
+      </button>
+      
+
+      
+      <div class="navbar-brand-mobile-wrapper d-inline-flex d-lg-none">
+        <a class="navbar-brand" href="/">Risk Predictions</a>
+      </div>
+      
+
+      
+      
+      <div class="navbar-collapse main-menu-item collapse justify-content-start" id="navbar-content">
+
+        
+        <ul class="navbar-nav d-md-inline-flex">
+          
+
+          
+
+          
+          
+          
+            
+          
+
+          
+
+          
+          
+          
+          
+
+          
+            
+              
+              
+            
+            
+              
+              
+              
+                
+              
+              
+            
+          
+
+          <li class="nav-item">
+            <a class="nav-link " href="/#about"><span>Home</span></a>
+          </li>
+
+          
+          
+
+          
+
+          
+          
+          
+            
+          
+
+          
+
+          
+          
+          
+          
+
+          
+            
+              
+              
+            
+            
+              
+              
+              
+                
+              
+              
+            
+          
+
+          <li class="nav-item">
+            <a class="nav-link " href="/#posts"><span>Posts</span></a>
+          </li>
+
+          
+          
+
+        
+
+          
+        </ul>
+      </div>
+
+      <ul class="nav-icons navbar-nav flex-row ml-auto d-flex pl-md-2">
+
+        
+        
+
+        
+        
+        <li class="nav-item">
+          <a class="nav-link js-search" href="#" aria-label="Search"><i class="fas fa-search" aria-hidden="true"></i></a>
+        </li>
+        
+
+        
+        
+        
+        <li class="nav-item dropdown theme-dropdown">
+          <a href="#" class="nav-link" data-toggle="dropdown" aria-haspopup="true" aria-label="Display preferences">
+            <i class="fas fa-moon" aria-hidden="true"></i>
+          </a>
+          <div class="dropdown-menu">
+            <a href="#" class="dropdown-item js-set-theme-light">
+              <span>Light</span>
+            </a>
+            <a href="#" class="dropdown-item js-set-theme-dark">
+              <span>Dark</span>
+            </a>
+            <a href="#" class="dropdown-item js-set-theme-auto">
+              <span>Automatic</span>
+            </a>
+          </div>
+        </li>
+        
+
+        
+        
+
+      </ul>
+
+    </div>
+  </nav>
+</header>
+
+
+  </div>
+
+  <div class="page-body">
+    
+    
+    
+
+    <article class="article">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+  
+  
+<div class="article-container pt-3">
+  <h1>Discrete Event Simulation - Part II</h1>
+
+  
+
+  
+    
+
+
+<div class="article-metadata">
+
+  
+  
+
+  
+  <span class="article-date">
+    
+    
+      
+          Last updated on
+      
+    
+    Jul 23, 2022
+  </span>
+  
+
+  
+
+  
+  <span class="middot-divider"></span>
+  <span class="article-reading-time">
+    6 min read
+  </span>
+  
+
+  
+  
+  
+  
+
+  
+  
+  <span class="middot-divider"></span>
+  <span class="article-categories">
+    <i class="fas fa-folder mr-1"></i><a href="/category/simulation/">simulation</a></span>
+  
+
+</div>
+
+    
+
+
+
+
+
+  
+</div>
+
+
+
+  <div class="article-container">
+
+    <div class="article-style">
+      <script src="/post/discrete-event-simulation-part-ii/index.en_files/htmlwidgets/htmlwidgets.js"></script>
+<script src="/post/discrete-event-simulation-part-ii/index.en_files/viz/viz.js"></script>
+<link href="/post/discrete-event-simulation-part-ii/index.en_files/DiagrammeR-styles/styles.css" rel="stylesheet" />
+<script src="/post/discrete-event-simulation-part-ii/index.en_files/grViz-binding/grViz.js"></script>
+<p>This is a repost of the bolg by me dated 2018-05-21.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="c1">#prepare the libraries</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">simmer</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">simmer.plot</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">library</span><span class="p">(</span><span class="n">intervals</span><span class="p">)</span>
+</span></span></code></pre></div><h2 id="simmer-for-r">Simmer for R</h2>
+<p>In my short experiment with Simpy and Simmer, Simmer shines in one area: monitoring.
+In Simpy a list can be passed to the simulation, and it is flexible to choose what to code.</p>
+<p>With Simmer, three commands <code>get_mon_arrivals()</code>, <code>get_mon_attributes()</code>, <code>get_mon_resources()</code> can generate the story book of the simulation. The story is in data.frame format, and can be easily processed in R.</p>
+<p>Let’s use the Machine Shop as an Example.</p>
+<p>Instead of print out the events in user interface with <code>log_()</code>, we make the simulation <code>invisible</code>, and add an attribute to log the state (working, fail).</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">machine</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">mttf</span><span class="p">,</span> <span class="n">repair_time</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      <span class="n">machie</span> <span class="o">&lt;-</span> <span class="nf">trajectory</span><span class="p">()</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">      <span class="c1"># machine_state: 1-working, 0-fail</span>
+</span></span><span class="line"><span class="cl">      <span class="nf">set_attribute</span><span class="p">(</span><span class="s">&#34;machine_state&#34;</span><span class="p">,</span> <span class="m">1</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">        <span class="nf">timeout</span><span class="p">(</span><span class="nf">function</span><span class="p">()</span> <span class="nf">rexp</span><span class="p">(</span><span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="o">/</span><span class="n">mttf</span><span class="p">))</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">        <span class="nf">set_attribute</span><span class="p">(</span><span class="s">&#34;machine_state&#34;</span><span class="p">,</span> <span class="m">-1</span><span class="p">,</span> <span class="n">mod</span><span class="o">=</span><span class="s">&#34;+&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">        <span class="nf">seize</span><span class="p">(</span><span class="s">&#34;repairman&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">        <span class="nf">timeout</span><span class="p">(</span><span class="n">repair_time</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">        <span class="nf">release</span><span class="p">(</span><span class="s">&#34;repairman&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">        <span class="nf">set_attribute</span><span class="p">(</span><span class="s">&#34;machine_state&#34;</span><span class="p">,</span> <span class="m">1</span><span class="p">,</span> <span class="n">mod</span><span class="o">=</span><span class="s">&#34;+&#34;</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">        <span class="nf">rollback</span><span class="p">(</span><span class="m">6</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> 
+</span></span><span class="line"><span class="cl"><span class="nf">plot</span><span class="p">(</span><span class="nf">machine</span><span class="p">(</span><span class="m">10</span><span class="p">,</span><span class="m">1</span><span class="p">))</span>
+</span></span></code></pre></div><div id="htmlwidget-1" style="width:672px;height:480px;" class="grViz html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"diagram":"digraph {\n\ngraph [layout = \"dot\",\n       outputorder = \"edgesfirst\",\n       bgcolor = \"white\"]\n\nnode [fontname = \"sans-serif\",\n      fontsize = \"10\",\n      shape = \"circle\",\n      fixedsize = \"true\",\n      width = \"1.5\",\n      style = \"filled\",\n      fillcolor = \"aliceblue\",\n      color = \"gray70\",\n      fontcolor = \"gray50\"]\n\nedge [fontname = \"Helvetica\",\n     fontsize = \"8\",\n     len = \"1.5\",\n     color = \"gray80\",\n     arrowsize = \"0.5\"]\n\n  \"1\" [label = \"SetAttribute\", shape = \"box\", style = \"solid\", color = \"black\", tooltip = \"keys: [machine_state], values: [1], global: 0, mod: N, init: 0\", fontcolor = \"black\", fillcolor = \"#000000\"] \n  \"2\" [label = \"Timeout\", shape = \"box\", style = \"solid\", color = \"black\", tooltip = \"delay: function()\", fontcolor = \"black\", fillcolor = \"#000000\"] \n  \"3\" [label = \"SetAttribute\", shape = \"box\", style = \"solid\", color = \"black\", tooltip = \"keys: [machine_state], values: [-1], global: 0, mod: +, init: 0\", fontcolor = \"black\", fillcolor = \"#000000\"] \n  \"4\" [label = \"Seize\", shape = \"box\", style = \"filled\", color = \"#7FC97F\", tooltip = \"resource: repairman, amount: 1\", fontcolor = \"black\", fillcolor = \"#7FC97F\"] \n  \"5\" [label = \"Timeout\", shape = \"box\", style = \"solid\", color = \"black\", tooltip = \"delay: 1\", fontcolor = \"black\", fillcolor = \"#000000\"] \n  \"6\" [label = \"Release\", shape = \"box\", style = \"filled\", color = \"#7FC97F\", tooltip = \"resource: repairman, amount: 1\", fontcolor = \"black\", fillcolor = \"#7FC97F\"] \n  \"7\" [label = \"SetAttribute\", shape = \"box\", style = \"solid\", color = \"black\", tooltip = \"keys: [machine_state], values: [1], global: 0, mod: +, init: 0\", fontcolor = \"black\", fillcolor = \"#000000\"] \n  \"8\" [label = \"Rollback\", shape = \"diamond\", style = \"filled\", color = \"lightgrey\", tooltip = \"times: -1\", fontcolor = \"black\", fillcolor = \"#D3D3D3\"] \n\"1\"->\"2\" [color = \"black\", style = \"solid\"] \n\"2\"->\"3\" [color = \"black\", style = \"solid\"] \n\"3\"->\"4\" [color = \"black\", style = \"solid\"] \n\"4\"->\"5\" [color = \"black\", style = \"solid\"] \n\"5\"->\"6\" [color = \"black\", style = \"solid\"] \n\"6\"->\"7\" [color = \"black\", style = \"solid\"] \n\"7\"->\"8\" [color = \"black\", style = \"solid\"] \n\"8\"->\"2\" [color = \"grey\", style = \"dashed\"] \n}","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<p>Make it a function.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">simmer_relia</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">sim_time</span><span class="p">,</span> <span class="n">mon_</span> <span class="o">=</span> <span class="s">&#34;attributes&#34;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">env</span> <span class="o">&lt;-</span> <span class="nf">simmer</span><span class="p">()</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">  <span class="c1"># use resource to track system state</span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># all items in series will require same &#34;repair&#34; resource. </span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># set capacity to inf, assuming no queue for repair</span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># if repair resource busy -&gt; system down</span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># for n-oo-k items, if resource server &gt; k-n -&gt;system down </span>
+</span></span><span class="line"><span class="cl">  <span class="nf">add_resource</span><span class="p">(</span><span class="s">&#34;repairman&#34;</span><span class="p">,</span> <span class="n">capacity</span> <span class="o">=</span> <span class="kc">Inf</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">  <span class="nf">add_generator</span><span class="p">(</span><span class="s">&#34;machine_a&#34;</span><span class="p">,</span> <span class="nf">machine</span><span class="p">(</span><span class="m">100</span><span class="p">,</span> <span class="m">10</span><span class="p">),</span> <span class="nf">at</span><span class="p">(</span><span class="m">0</span><span class="p">),</span> <span class="n">mon</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">  <span class="nf">add_generator</span><span class="p">(</span><span class="s">&#34;machine_b&#34;</span><span class="p">,</span> <span class="nf">machine</span><span class="p">(</span><span class="m">100</span><span class="p">,</span> <span class="m">5</span><span class="p">),</span> <span class="nf">at</span><span class="p">(</span><span class="m">0</span><span class="p">),</span> <span class="n">mon</span> <span class="o">=</span> <span class="m">2</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">  <span class="nf">run</span><span class="p">(</span><span class="n">sim_time</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">  <span class="n">invisible</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">if </span><span class="p">(</span><span class="n">mon_</span><span class="o">==</span><span class="s">&#34;resources&#34;</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sim_log</span> <span class="o">&lt;-</span> <span class="nf">get_mon_resources</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span> <span class="n">else</span> <span class="nf">if </span><span class="p">(</span><span class="n">mon_</span><span class="o">==</span><span class="s">&#34;attributes&#34;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">sim_log</span> <span class="o">&lt;-</span> <span class="nf">get_mon_attributes</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sim_log</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><h3 id="loop-for-replications">Loop for replications</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">N_RUN</span> <span class="o">&lt;-</span>  <span class="m">10</span>
+</span></span><span class="line"><span class="cl"><span class="n">SIM_END</span> <span class="o">=</span> <span class="m">500</span>
+</span></span><span class="line"><span class="cl"><span class="n">ptm</span> <span class="o">&lt;-</span> <span class="nf">proc.time</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="n">machine_state_log</span> <span class="o">&lt;-</span> <span class="m">1</span><span class="o">:</span><span class="n">N_RUN</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">  <span class="nf">map_df</span><span class="p">(</span><span class="nf">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="nf">cbind</span><span class="p">(</span><span class="nf">simmer_relia</span><span class="p">(</span><span class="n">SIM_END</span><span class="p">),</span> <span class="nf">tibble</span><span class="p">(</span><span class="n">i_run</span> <span class="o">=</span> <span class="n">x</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl"><span class="n">simmer_time</span> <span class="o">&lt;-</span> <span class="nf">proc.time</span><span class="p">()</span> <span class="o">-</span> <span class="n">ptm</span>
+</span></span><span class="line"><span class="cl"><span class="nf">tail</span><span class="p">(</span><span class="n">machine_state_log</span><span class="p">)</span>
+</span></span></code></pre></div><pre><code>##         time       name           key value replication i_run
+## 209 442.3666 machine_b0 machine_state     0           1    10
+## 210 447.3666 machine_b0 machine_state     1           1    10
+## 211 462.9960 machine_a0 machine_state     0           1    10
+## 212 472.8377 machine_b0 machine_state     0           1    10
+## 213 472.9960 machine_a0 machine_state     1           1    10
+## 214 477.8377 machine_b0 machine_state     1           1    10
+</code></pre>
+<p>Test</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">simu_attributes</span> <span class="o">&lt;-</span> <span class="nf">simmer_relia</span><span class="p">(</span><span class="m">500</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">simu_attributes</span><span class="p">)</span>
+</span></span></code></pre></div><pre><code>##         time       name           key value replication
+## 1    0.00000 machine_a0 machine_state     1           1
+## 2    0.00000 machine_b0 machine_state     1           1
+## 3   42.28105 machine_b0 machine_state     0           1
+## 4   47.28105 machine_b0 machine_state     1           1
+## 5   77.35852 machine_a0 machine_state     0           1
+## 6   87.35852 machine_a0 machine_state     1           1
+## 7   98.15019 machine_b0 machine_state     0           1
+## 8  103.15019 machine_b0 machine_state     1           1
+## 9  111.34813 machine_a0 machine_state     0           1
+## 10 121.34813 machine_a0 machine_state     1           1
+## 11 151.84864 machine_a0 machine_state     0           1
+## 12 161.84864 machine_a0 machine_state     1           1
+## 13 179.71953 machine_b0 machine_state     0           1
+## 14 184.71953 machine_b0 machine_state     1           1
+## 15 236.37764 machine_b0 machine_state     0           1
+## 16 241.37764 machine_b0 machine_state     1           1
+## 17 259.25923 machine_a0 machine_state     0           1
+## 18 269.25923 machine_a0 machine_state     1           1
+## 19 397.68679 machine_a0 machine_state     0           1
+## 20 407.68679 machine_a0 machine_state     1           1
+</code></pre>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">simu_resources</span> <span class="o">&lt;-</span> <span class="nf">simmer_relia</span><span class="p">(</span><span class="m">500</span><span class="p">,</span> <span class="n">mon</span> <span class="o">=</span> <span class="s">&#34;resources&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">plot</span><span class="p">(</span><span class="n">simu_resources</span><span class="p">,</span> <span class="n">metric</span> <span class="o">=</span> <span class="s">&#34;usage&#34;</span><span class="p">,</span> <span class="s">&#34;repairman&#34;</span><span class="p">,</span> <span class="n">items</span> <span class="o">=</span> <span class="s">&#34;server&#34;</span><span class="p">,</span> <span class="n">steps</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+</span></span></code></pre></div><img src="/post/discrete-event-simulation-part-ii/index.en_files/figure-html/unnamed-chunk-6-1.png" width="672" />
+<h1 id="monitoring-resources-vs-attributes">Monitoring: resources vs attributes</h1>
+<p>With simmer, by adding user-defined attributes, we can log the simualtion flexibly. In the context of the system reliability, since only one “repariman” resource is requested when ANY of the machines fail, the “repairman” resource can be used directly for simple system reliability metrics. If the it is series system, whenever the repairman is busy, the system is down. Or it is n-out-of-k, then &gt;= n simultaneous “repairs” implies system down.</p>
+<p>The attribute logs the state of all the “machines”, it is more flexible to use the attributes. We are interest in the event sequence of the system down time, the <code>Intervals</code> pacakge, which provides a collections of operation on intervals over the real number line (R), is helpful the determine the system state base on the component state.</p>
+<p>In the example above, we have the event sequence of the machine_a and machine_b, so for a parellel system, the intersection of downtime interval is the system down time. and for a series system, union.</p>
+<h3 id="convert-event-sequences-to-state-intervals">Convert event sequences to state intervals</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">machine_state_interval</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">machine_state_log</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">  <span class="n">machine_state_log</span> <span class="o">%&gt;%</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">group_by</span><span class="p">(</span><span class="n">i_run</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">    <span class="nf">arrange</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">    <span class="c1"># end_time is lead(start_time) (remove leading NA), last one is sim_end</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">mutate</span><span class="p">(</span><span class="n">end_time</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="nf">head</span><span class="p">(</span><span class="nf">lead</span><span class="p">(</span><span class="n">time</span><span class="p">),</span> <span class="m">-1</span><span class="p">),</span> <span class="n">SIM_END</span><span class="p">))</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">    <span class="nf">ungroup</span><span class="p">()</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">    <span class="n">dplyr</span><span class="o">::</span><span class="nf">select</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">,</span> <span class="n">end_time</span><span class="p">,</span> <span class="n">i_run</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">    <span class="nf">arrange</span><span class="p">(</span><span class="n">i_run</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">start_time</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">state_interval</span> <span class="o">&lt;-</span> <span class="nf">machine_state_interval</span><span class="p">(</span><span class="n">machine_state_log</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">machine_down_interval</span> <span class="o">&lt;-</span> <span class="nf">function</span><span class="p">(</span><span class="n">state_interval</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">machine_name</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">  <span class="n">fail_log</span> <span class="o">&lt;-</span> <span class="n">state_interval</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">    <span class="nf">filter</span><span class="p">(</span><span class="n">i_run</span> <span class="o">==</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="o">==</span> <span class="n">machine_name</span><span class="p">)</span> <span class="o">%&gt;%</span> 
+</span></span><span class="line"><span class="cl">    <span class="nf">filter</span><span class="p">(</span><span class="n">value</span> <span class="o">==</span> <span class="m">0</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">Intervals</span><span class="p">(</span><span class="nf">matrix</span><span class="p">(</span><span class="nf">c</span><span class="p">(</span><span class="n">fail_log</span><span class="o">$</span><span class="n">start_time</span><span class="p">,</span><span class="n">fail_log</span><span class="o">$</span><span class="n">end_time</span><span class="p">),</span> <span class="n">ncol</span> <span class="o">=</span> <span class="m">2</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> 
+</span></span></code></pre></div><h3 id="parallel---intersection-of-the-interval">parallel -&gt; intersection of the interval</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">parallel_down_log</span> <span class="o">&lt;-</span> <span class="nf">tibble</span><span class="p">(</span><span class="n">start_time</span> <span class="o">=</span> <span class="nf">as.numeric</span><span class="p">(),</span> <span class="n">end_time</span> <span class="o">=</span> <span class="nf">as.numeric</span><span class="p">(),</span> <span class="n">i_run</span> <span class="o">=</span> <span class="nf">as.integer</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="n">N_RUN</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">  <span class="n">parallel_down_interval</span> <span class="o">&lt;-</span> <span class="nf">interval_intersection</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">machine_down_interval</span><span class="p">(</span><span class="n">state_interval</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s">&#34;machine_a0&#34;</span><span class="p">),</span> 
+</span></span><span class="line"><span class="cl">    <span class="nf">machine_down_interval</span><span class="p">(</span><span class="n">state_interval</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s">&#34;machine_b0&#34;</span><span class="p">)</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">if</span><span class="p">(</span><span class="nf">length</span><span class="p">(</span><span class="n">parallel_down_interval</span><span class="p">)</span> <span class="o">&gt;</span> <span class="m">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">print</span><span class="p">(</span><span class="n">parallel_down_interval</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">parallel_down_log</span> <span class="o">&lt;-</span> <span class="nf">rbind</span><span class="p">(</span><span class="n">parallel_down_log</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">                            <span class="nf">cbind</span><span class="p">(</span><span class="nf">as.matrix</span><span class="p">(</span><span class="n">parallel_down_interval</span><span class="p">),</span> <span class="nf">tibble</span><span class="p">(</span><span class="n">i_run</span> <span class="o">=</span> <span class="n">i</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><pre><code>## [1] 2
+## Object of class Intervals
+## 1 interval over R:
+## [478.915332901574, 483.915332901574]
+## [1] 4
+## Object of class Intervals
+## 3 intervals over R:
+## [127.319955610845, 132.319955610845]
+## [172.881427812846, 173.262362609792]
+## [342.919421858134, 345.583527818413]
+## [1] 8
+## Object of class Intervals
+## 2 intervals over R:
+## [31.0425011441112, 32.3605401348323]
+## [228.437912753763, 232.337844351521]
+## [1] 9
+## Object of class Intervals
+## 3 intervals over R:
+## [218.752050740942, 223.752050740942]
+## [223.757618140727, 225.728760083031]
+## [392.129864142056, 397.129864142056]
+## [1] 10
+## Object of class Intervals
+## 2 intervals over R:
+## [177.240104033592, 178.677071282164]
+## [472.837684197787, 472.99596169469]
+</code></pre>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="nf">names</span><span class="p">(</span><span class="n">parallel_down_log</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;start&#34;</span><span class="p">,</span> <span class="s">&#34;end&#34;</span><span class="p">,</span> <span class="s">&#34;i_run&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">print</span><span class="p">(</span><span class="n">parallel_down_log</span><span class="p">)</span>
+</span></span></code></pre></div><pre><code>##       start       end i_run
+## 1  478.9153 483.91533     2
+## 2  127.3200 132.31996     4
+## 3  172.8814 173.26236     4
+## 4  342.9194 345.58353     4
+## 5   31.0425  32.36054     8
+## 6  228.4379 232.33784     8
+## 7  218.7521 223.75205     9
+## 8  223.7576 225.72876     9
+## 9  392.1299 397.12986     9
+## 10 177.2401 178.67707    10
+## 11 472.8377 472.99596    10
+</code></pre>
+<h3 id="series---union-of-the-interval">Series -&gt; union of the interval</h3>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-r" data-lang="r"><span class="line"><span class="cl"><span class="n">series_down_log</span> <span class="o">&lt;-</span> <span class="nf">tibble</span><span class="p">(</span><span class="n">start_time</span> <span class="o">=</span> <span class="nf">as.numeric</span><span class="p">(),</span> <span class="n">end_time</span> <span class="o">=</span> <span class="nf">as.numeric</span><span class="p">(),</span> <span class="n">i_run</span> <span class="o">=</span> <span class="nf">as.integer</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nf">for </span><span class="p">(</span><span class="n">i</span> <span class="n">in</span> <span class="m">1</span><span class="o">:</span><span class="n">N_RUN</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">  <span class="n">series_down_interval</span> <span class="o">&lt;-</span> <span class="nf">interval_union</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">    <span class="nf">machine_down_interval</span><span class="p">(</span><span class="n">state_interval</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s">&#34;machine_a0&#34;</span><span class="p">),</span> 
+</span></span><span class="line"><span class="cl">    <span class="nf">machine_down_interval</span><span class="p">(</span><span class="n">state_interval</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s">&#34;machine_b0&#34;</span><span class="p">)</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">if</span><span class="p">(</span><span class="nf">length</span><span class="p">(</span><span class="n">series_down_interval</span><span class="p">)</span> <span class="o">&gt;</span> <span class="m">0</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">series_down_log</span> <span class="o">&lt;-</span> <span class="nf">rbind</span><span class="p">(</span><span class="n">series_down_log</span><span class="p">,</span> 
+</span></span><span class="line"><span class="cl">                             <span class="nf">cbind</span><span class="p">(</span><span class="nf">as.matrix</span><span class="p">(</span><span class="n">series_down_interval</span><span class="p">),</span> <span class="nf">tibble</span><span class="p">(</span><span class="n">i_run</span> <span class="o">=</span> <span class="n">i</span><span class="p">)))</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="nf">names</span><span class="p">(</span><span class="n">series_down_log</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;start&#34;</span><span class="p">,</span> <span class="s">&#34;end&#34;</span><span class="p">,</span> <span class="s">&#34;i_run&#34;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nf">head</span><span class="p">(</span><span class="n">series_down_log</span><span class="p">,</span><span class="m">20</span><span class="p">)</span>
+</span></span></code></pre></div><pre><code>##        start       end i_run
+## 1   16.19063  21.19063     1
+## 2  129.24719 139.24719     1
+## 3  185.54990 195.54990     1
+## 4  238.09241 248.09241     1
+## 5  286.15305 291.15305     1
+## 6  329.35981 339.35981     1
+## 7  394.35776 404.35776     1
+## 8  430.09741 435.09741     1
+## 9  442.58259 447.58259     1
+## 10  24.76090  29.76090     2
+## 11  36.06396  46.06396     2
+## 12 168.25193 178.25193     2
+## 13 297.63221 302.63221     2
+## 14 312.97773 322.97773     2
+## 15 345.40873 355.40873     2
+## 16 413.44466 418.44466     2
+## 17 477.55216 487.55216     2
+## 18 495.97379 500.00000     2
+## 19  30.97991  35.97991     3
+## 20 189.75923 194.75923     3
+</code></pre>
+
+    </div>
+
+    
+
+
+
+
+<div class="article-tags">
+  
+  <a class="badge badge-light" href="/tag/des/">DES</a>
+  
+  <a class="badge badge-light" href="/tag/rstats/">rstats</a>
+  
+  <a class="badge badge-light" href="/tag/repairable/">Repairable</a>
+  
+</div>
+
+
+
+<div class="share-box">
+  <ul class="share">
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://twitter.com/intent/tweet?url=/post/discrete-event-simulation-part-ii/&amp;text=Discrete%20Event%20Simulation%20-%20Part%20II" target="_blank" rel="noopener" class="share-btn-twitter" aria-label="twitter">
+          <i class="fab fa-twitter"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.facebook.com/sharer.php?u=/post/discrete-event-simulation-part-ii/&amp;t=Discrete%20Event%20Simulation%20-%20Part%20II" target="_blank" rel="noopener" class="share-btn-facebook" aria-label="facebook">
+          <i class="fab fa-facebook"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="mailto:?subject=Discrete%20Event%20Simulation%20-%20Part%20II&amp;body=/post/discrete-event-simulation-part-ii/" target="_blank" rel="noopener" class="share-btn-email" aria-label="envelope">
+          <i class="fas fa-envelope"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://www.linkedin.com/shareArticle?url=/post/discrete-event-simulation-part-ii/&amp;title=Discrete%20Event%20Simulation%20-%20Part%20II" target="_blank" rel="noopener" class="share-btn-linkedin" aria-label="linkedin-in">
+          <i class="fab fa-linkedin-in"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="whatsapp://send?text=Discrete%20Event%20Simulation%20-%20Part%20II%20/post/discrete-event-simulation-part-ii/" target="_blank" rel="noopener" class="share-btn-whatsapp" aria-label="whatsapp">
+          <i class="fab fa-whatsapp"></i>
+        </a>
+      </li>
+    
+      
+      
+      
+        
+      
+      
+      
+      <li>
+        <a href="https://service.weibo.com/share/share.php?url=/post/discrete-event-simulation-part-ii/&amp;title=Discrete%20Event%20Simulation%20-%20Part%20II" target="_blank" rel="noopener" class="share-btn-weibo" aria-label="weibo">
+          <i class="fab fa-weibo"></i>
+        </a>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+
+
+
+  
+  
+  
+    
+  
+  
+  
+  <div class="media author-card content-widget-hr">
+    
+      
+      <a href="/"><img class="avatar mr-3 avatar-circle" src="/authors/admin/avatar_hu22d83df22f4f441b6ca6bf11685edf8c_296566_270x270_fill_lanczos_center_3.png" alt="Yunwei Hu"></a>
+    
+
+    <div class="media-body">
+      <h5 class="card-title"><a href="/">Yunwei Hu</a></h5>
+      
+      <p class="card-text">My research interests include robotics, machine learning, and probabilistic modeling.</p>
+      <ul class="network-icon" aria-hidden="true">
+  
+</ul>
+
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+</article>
+  </div>
+
+  <div class="page-footer">
+    
+    
+    <div class="container">
+      <footer class="site-footer">
+
+  
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+
+
+
+
+
+  
+  
+  
+
+  
+  
+    
+  
+  
+    
+  
+
+  
+
+  
+  <p class="powered-by copyright-license-text">
+    © 2022 Me. This work is licensed under <a href="https://creativecommons.org/licenses/by-nc-nd/4.0" rel="noopener noreferrer" target="_blank">CC BY NC ND 4.0</a>
+  </p>
+  
+
+  <p class="powered-by footer-license-icons">
+    <a href="https://creativecommons.org/licenses/by-nc-nd/4.0" rel="noopener noreferrer" target="_blank" aria-label="Creative Commons">
+      <i class="fab fa-creative-commons fa-2x" aria-hidden="true"></i>
+      <i class="fab fa-creative-commons-by fa-2x" aria-hidden="true"></i>
+      
+        <i class="fab fa-creative-commons-nc fa-2x" aria-hidden="true"></i>
+      
+      
+        <i class="fab fa-creative-commons-nd fa-2x" aria-hidden="true"></i>
+      
+    </a>
+  </p>
+
+
+
+
+  <p class="powered-by">
+    
+    
+    
+      
+      
+      
+      
+      
+      
+      Published with <a href="https://wowchemy.com/?utm_campaign=poweredby" target="_blank" rel="noopener">Wowchemy</a> — the free, <a href="https://github.com/wowchemy/wowchemy-hugo-themes" target="_blank" rel="noopener">open source</a> website builder that empowers creators.
+    
+  </p>
+</footer>
+
+    </div>
+    
+  </div>
+
+      
+
+    
+    <script src="/js/vendor-bundle.min.46271ef31da3f018e9cd1b59300aa265.js"></script>
+
+    
+    
+    
+      
+
+      
+      
+
+      
+
+      
+        
+        <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/highlight.min.js" integrity="sha512-Ypjm0o7jOxAd4hpdoppSEN0TQOC19UtPAqD+4s5AlXmUvbmmS/YMxYqAqarQYyxTnB6/rqip9qcxlNB/3U9Wdg==" crossorigin="anonymous"></script>
+        
+        
+        <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/languages/r.min.js" crossorigin="anonymous"></script>
+        
+        <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@10.2.1/build/languages/latex.min.js" crossorigin="anonymous"></script>
+        
+      
+
+    
+
+    
+    
+    
+
+    
+    
+
+    
+    
+    
+      
+      <script id="search-hit-fuse-template" type="text/x-template">
+        <div class="search-hit" id="summary-{{key}}">
+          <div class="search-hit-content">
+            <div class="search-hit-name">
+              <a href="{{relpermalink}}">{{title}}</a>
+              <div class="article-metadata search-hit-type">{{type}}</div>
+              <p class="search-hit-description">{{snippet}}</p>
+            </div>
+          </div>
+        </div>
+      </script>
+      
+        <script src="https://cdn.jsdelivr.net/gh/krisk/Fuse@v3.2.1/dist/fuse.min.js" integrity="sha512-o38bmzBGX+hD3JHWUFCDA09btWaqrNmoJ3RXLlrysA7PP01Kgs4UlE4MhelE1v5dJR3+cxlR4qQlotsW7jKsnw==" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/gh/julmot/mark.js@8.11.1/dist/jquery.mark.min.js" integrity="sha512-mhbv5DqBMgrWL+32MmsDOt/OAvqr/cHimk6B8y/bx/xS88MVkYGPiVv2ixKVrkywF2qHplNRUvFsAHUdxZ3Krg==" crossorigin="anonymous"></script>
+      
+    
+
+    
+    
+
+    
+    
+    
+    
+
+    
+    
+      
+      
+      
+      
+      
+      
+      
+    
+
+    
+
+    
+    
+    
+    <script id="page-data" type="application/json">{"use_headroom":true}</script>
+
+    
+    
+      <script src="/js/wowchemy-headroom.c251366b4128fd5e6b046d4c97a62a51.js" type="module"></script>
+    
+    
+    
+    
+    
+    
+    
+      
+      
+    
+    
+    <script src="/en/js/wowchemy.min.3239609ca7abe02ed52d76ffcb22af1d.js"></script>
+
+    
+    
+    
+    
+    
+    
+      
+<div id="modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Cite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <pre><code class="tex hljs"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-outline-primary my-1 js-copy-cite" href="#" target="_blank">
+          <i class="fas fa-copy"></i> Copy
+        </a>
+        <a class="btn btn-outline-primary my-1 js-download-cite" href="#" target="_blank">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <div id="modal-error"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      <script src="/js/wowchemy-publication.68f8d7090562ca65fc6d3cb3f8f2d2cb.js" type="module"></script>
+
+
+
+
+
+
+</body>
+</html>

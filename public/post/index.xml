@@ -5,12 +5,531 @@
     <link>/post/</link>
       <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     <description>Posts</description>
-    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><lastBuildDate>Fri, 22 Jul 2022 00:00:00 +0000</lastBuildDate>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><lastBuildDate>Thu, 28 Jul 2022 00:00:00 +0000</lastBuildDate>
     <image>
-      <url>/media/icon_hua2ec155b4296a9c9791d015323e16eb5_11927_512x512_fill_lanczos_center_3.png</url>
+      <url>/media/icon_hu22d83df22f4f441b6ca6bf11685edf8c_296566_512x512_fill_lanczos_center_3.png</url>
       <title>Posts</title>
       <link>/post/</link>
     </image>
+    
+    <item>
+      <title>Simulation for Reliability Engineering</title>
+      <link>/post/simulation-for-reliability-engineering/</link>
+      <pubDate>Thu, 28 Jul 2022 00:00:00 +0000</pubDate>
+      <guid>/post/simulation-for-reliability-engineering/</guid>
+      <description>
+
+
+&lt;p&gt;Repost of old blog post.&lt;/p&gt;
+&lt;div id=&#34;simulation-of-repairable-systems&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Simulation of Repairable Systems&lt;/h2&gt;
+&lt;p&gt;First things first, this is not blog post. It is a summary of some codes I wrote a while back. Later similar efforts were continued in &lt;a href=&#34;https://github.com/huyunwei/des&#34;&gt;Python&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The objective to develop some Python DES tools for simple series/parallel systems, similar to the &lt;a href=&#34;http://reliabilityanalyticstoolkit.appspot.com/discrete_event_simulation&#34;&gt;Reliability Analytics Toolkit by Seymour Morris&lt;/a&gt;. The pet project for this month :)&lt;/p&gt;
+&lt;div id=&#34;the-grp-model-for-parametric-recurrent-event-data-analysis&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;The GRP Model for Parametric Recurrent Event Data Analysis&lt;/h3&gt;
+&lt;p&gt;We follow the convention in [Ref 1] (&lt;a href=&#34;http://www.weibull.com/hotwire/issue59/relbasics59.htm&#34; class=&#34;uri&#34;&gt;http://www.weibull.com/hotwire/issue59/relbasics59.htm&lt;/a&gt;). (Fix typo in type II eq.)&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;In this model, the concept of virtual age is introduced. Denote by t1,t2,…,tn the successive failure times and let x1,x2,…,x3 represent the time between failures. Assume that after each event, actions are taken to improve the system performance. Let q be the action effectiveness factor. There are two GRP models. &lt;/br&gt;
+- Type I: &lt;span class=&#34;math inline&#34;&gt;\(v_i = v_{i-1} + q \cdot x_i = q \cdot t_i\)&lt;/span&gt; &lt;/br&gt;
+- Type II: &lt;span class=&#34;math inline&#34;&gt;\(v_i = q \cdot (v_{i-1} + x_i )= \sum_{k=1}^i q^{i-k+1} \cdot x_k\)&lt;/span&gt;&lt;/br&gt;
+where &lt;span class=&#34;math inline&#34;&gt;\(v_i\)&lt;/span&gt; is the virtual age of the system right after the ith repair. The Type I model assumes that the $i^{th} repair cannot remove the damage incurred before the &lt;span class=&#34;math inline&#34;&gt;\(i^{th}\)&lt;/span&gt; failure. It can only reduce the additional age &lt;span class=&#34;math inline&#34;&gt;\(x_i\)&lt;/span&gt; to &lt;span class=&#34;math inline&#34;&gt;\(q \cdot x_i\)&lt;/span&gt;. The Type II model assumes that at the &lt;span class=&#34;math inline&#34;&gt;\(i^{th}\)&lt;/span&gt; repair, the virtual age has been accumulated to &lt;span class=&#34;math inline&#34;&gt;\(v_{i-1} + x_i\)&lt;/span&gt;. The &lt;span class=&#34;math inline&#34;&gt;\(i^{th}\)&lt;/span&gt; repair will remove the cumulative damage from both current and previous failures by reducing the virtual age to &lt;span class=&#34;math inline&#34;&gt;\(q \cdot (v_{i-1} + x_i )\)&lt;/span&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/div&gt;
+&lt;div id=&#34;analytical-solution-and-simulation&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Analytical solution and Simulation&lt;/h3&gt;
+&lt;p&gt;There is no close form for the renewal function E(N(t)) of General Renewal Process , except for some special cases, such as where the q = 1 (as-bad-as-old, or NHPP) or q = 0 (as-good-as-new). Monte Carlo simulation can be used but it is desirable to find an approximation equation of renewal function for speed.&lt;/p&gt;
+&lt;div id=&#34;power-law-nhpp-as-bad-as-old&#34; class=&#34;section level4&#34;&gt;
+&lt;h4&gt;Power Law NHPP (as-bad-as-old)&lt;/h4&gt;
+&lt;p&gt;The power law function is used to model the rate of recurrence, which is: &lt;span class=&#34;math inline&#34;&gt;\(\lambda(t) = \lambda\beta t^{\beta-1}\)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;The conditional pdf is &lt;span class=&#34;math inline&#34;&gt;\(f(t_i|t_{i-1}) = \lambda \beta (x_i + v_{i-1})^{\beta-1} \cdot e^{-\lambda[(x_i + v_{i-1})^\beta - V_{i-1}^\beta]}\)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Comparing the ROCOF with Weibull hazard function, we can get: &lt;span class=&#34;math inline&#34;&gt;\(\lambda = \frac{1}{\eta^\beta}\)&lt;/span&gt; or &lt;span class=&#34;math inline&#34;&gt;\(\eta = (\frac{1}{\lambda})^{\frac{1}{\beta}}\)&lt;/span&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;test-the-simulation&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Test the simulation&lt;/h2&gt;
+&lt;p&gt;Test the simulation.
+- Matraix is much faster than data frame.&lt;/p&gt;
+&lt;div id=&#34;simgrp&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;simGRP&lt;/h3&gt;
+&lt;p&gt;The simDRA function returns the data frame of the simulation results, given alpha, beta, q.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(tidyverse)
+# Function to simulate the General Renewal Process
+# Input, Weibull(Scale and Shape)
+simGRP &amp;lt;- function (scale, shape = 1, q = 1, n_sim = 1e4, n_failure = 25) {
+  ttf &amp;lt;- matrix(NA, n_failure, n_sim )
+  
+  # generate time to 1st failure
+  ttf[1, ] &amp;lt;- rweibull(n_sim, scale = scale, shape = shape)
+  v_time &amp;lt;- ttf[1, ] * q
+  
+  # generating time to ith failure - inverse of conditional Weibull CDF
+  for (i in 2:n_failure) {
+    #  rand &amp;lt;- runif(n_sim)
+    ttf[i, ] &amp;lt;- scale *( ( (v_time/scale)^shape - log(1 - runif(n_sim)) )^(1 / shape)) - 
+      v_time + ttf[i-1, ]
+    v_time &amp;lt;- q * ttf[ i, ]
+  }
+  
+  #Return data frame
+  ttf &amp;lt;- tibble(time_to_f = as.vector(ttf), 
+                count_f = rep(1:n_failure, n_sim), 
+                simid = rep(1:n_sim, each = n_failure))
+}
+
+# start clock
+ptm &amp;lt;- proc.time()
+ttf &amp;lt;- simGRP( scale = 100, shape = 1, q = 0, n_sim = 1e6, n_failure = 25)
+proc.time() - ptm&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;##    user  system elapsed 
+##   2.588   0.222   2.853&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;data-analyis&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Data analyis&lt;/h2&gt;
+&lt;div id=&#34;build-the-functions-for-data-analysis&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Build the functions for Data Analysis&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Expected Time to failure&lt;/li&gt;
+&lt;li&gt;Pr(N = n, Time &amp;lt; t)&lt;/li&gt;
+&lt;li&gt;Pr(N &amp;gt;= n, Time &amp;lt; t)&lt;/li&gt;
+&lt;li&gt;Expected N(t)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ttn &amp;lt;- function (data) {
+  time_to_failure &amp;lt;- ttf %&amp;gt;%
+    group_by(count_f) %&amp;gt;%
+    summarise(avg = mean(time_to_f))
+}
+
+
+cumprob &amp;lt;- function( data, count_failure, time_p ) { 
+  dims &amp;lt;- data %&amp;gt;%
+  filter(count_f &amp;gt;= count_failure &amp;amp; time_to_f &amp;lt; time_p) %&amp;gt;%
+  dim()
+  dims[1]/dim(data)[1]}
+
+prob &amp;lt;- function( data, count_failure, time_p ) { 
+  dims &amp;lt;- data %&amp;gt;%
+  filter(count_f == count_failure &amp;amp; time_to_f &amp;lt; time_p) %&amp;gt;%
+  dim()
+  dims[1]/dim(data)[1]}
+
+prob(ttf, 3, 10000)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.04&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;cumprob(ttf, 3, 10000)&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.92&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# verify cumprob
+cprob = 0
+for (i in 3:40){ cprob = cprob + prob(ttf, i, 10000)}
+cprob&lt;/code&gt;&lt;/pre&gt;
+&lt;pre&gt;&lt;code&gt;## [1] 0.92&lt;/code&gt;&lt;/pre&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# Expected N(t)
+E_Nt &amp;lt;- function (data, t){
+  dims &amp;lt;- data %&amp;gt;%
+    filter(time_to_f &amp;lt; t) %&amp;gt;%
+    dim()
+  dims[1]/length(unique(data$simid))
+}&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;compare-expected-nt-with-expected-time-to-nth-failure&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Compare “Expected N(t)” with Expected “Time to nth failure”&lt;/h3&gt;
+&lt;p&gt;** “Time at which E[N(t)] = n” != Expected “Time to nth failure” **&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;time_to_nth &amp;lt;- ttn(ttf)
+ent &amp;lt;- sapply(as_vector(time_to_nth[,2]), function(x) E_Nt(ttf, x))
+# plot(1:25, ent)
+# abline(0,1)
+time_to_nth &amp;lt;- tibble(count_f = c(1:25, ent), 
+                      time = as_vector(rep(time_to_nth[,2],2)),
+                      src = rep(c(&amp;quot;ttf&amp;quot;, &amp;quot;ent&amp;quot;), each = 25))
+ggplot(time_to_nth, aes(x = time, y = count_f)) + geom_point(aes(color = src))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/simulation-for-reliability-engineering/index.en_files/figure-html/unnamed-chunk-3-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;discrete-event-simulation&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Discrete Event Simulation&lt;/h2&gt;
+&lt;p&gt;The Monte Carlo simulation discussd above is applicable to a single repairable block. The general renewal process also assumes minimal repair downtime. In plant reliability/availabilit analysis, we often deal with long outage time, planning resources etc. The Monte Carlo simulation as above cannot answer those questions.&lt;/p&gt;
+&lt;p&gt;Discrete Event Simulation (DES) is a more likely tool to solve sunch problems.&lt;/p&gt;
+&lt;p&gt;Reliability Block Diagram is often used as a graphical presentation of the Boolean logic of the system dependency i.e. the functioning state (i.e., success or failure) of the system in terms of the functioning states of its components. The commerical reliability software packages, such as Blocksim (R) from Reliasoft, extended the functionality of RBD. It not only calculates the Boolean logic and it also use it as graphic input for the simulation.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;reference&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Reference&lt;/h2&gt;
+&lt;ol style=&#34;list-style-type: decimal&#34;&gt;
+&lt;li&gt;RDA, Weibull++; &lt;a href=&#34;http://www.weibull.com/hotwire/issue59/relbasics59.htm&#34; class=&#34;uri&#34;&gt;http://www.weibull.com/hotwire/issue59/relbasics59.htm&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Mark P. Kaminskiy and Vasiliy V. Krivtsov&lt;/li&gt;
+&lt;li&gt;Saeed Maghsoodloo and Dilcu Helvaci, “Renewal and Renewal-Intensity Functions with Minimal Repair,” Journal of Quality and Reliability Engineering, vol. 2014, Article ID 857437, 10 pages, 2014. &lt;a href=&#34;doi:10.1155/2014/857437&#34; class=&#34;uri&#34;&gt;doi:10.1155/2014/857437&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;E. Smeitink and R. Dekker, “A simple approximation to the renewal function [reliability theory],” in IEEE Transactions on Reliability, vol. 39, no. 1, pp. 71-75, Apr 1990.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Discrete Event Simulation - Part II</title>
+      <link>/post/discrete-event-simulation-part-ii/</link>
+      <pubDate>Sat, 23 Jul 2022 00:00:00 +0000</pubDate>
+      <guid>/post/discrete-event-simulation-part-ii/</guid>
+      <description>&lt;script src=&#34;/post/discrete-event-simulation-part-ii/index.en_files/htmlwidgets/htmlwidgets.js&#34;&gt;&lt;/script&gt;
+&lt;script src=&#34;/post/discrete-event-simulation-part-ii/index.en_files/viz/viz.js&#34;&gt;&lt;/script&gt;
+&lt;link href=&#34;/post/discrete-event-simulation-part-ii/index.en_files/DiagrammeR-styles/styles.css&#34; rel=&#34;stylesheet&#34; /&gt;
+&lt;script src=&#34;/post/discrete-event-simulation-part-ii/index.en_files/grViz-binding/grViz.js&#34;&gt;&lt;/script&gt;
+&lt;p&gt;This is a repost of the bolg by me dated 2018-05-21.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;#prepare the libraries&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;library&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;tidyverse&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;library&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;simmer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;library&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;simmer.plot&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;library&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;intervals&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;simmer-for-r&#34;&gt;Simmer for R&lt;/h2&gt;
+&lt;p&gt;In my short experiment with Simpy and Simmer, Simmer shines in one area: monitoring.
+In Simpy a list can be passed to the simulation, and it is flexible to choose what to code.&lt;/p&gt;
+&lt;p&gt;With Simmer, three commands &lt;code&gt;get_mon_arrivals()&lt;/code&gt;, &lt;code&gt;get_mon_attributes()&lt;/code&gt;, &lt;code&gt;get_mon_resources()&lt;/code&gt; can generate the story book of the simulation. The story is in data.frame format, and can be easily processed in R.&lt;/p&gt;
+&lt;p&gt;Let’s use the Machine Shop as an Example.&lt;/p&gt;
+&lt;p&gt;Instead of print out the events in user interface with &lt;code&gt;log_()&lt;/code&gt;, we make the simulation &lt;code&gt;invisible&lt;/code&gt;, and add an attribute to log the state (working, fail).&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;machine&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;function&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;mttf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;repair_time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;){&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;n&#34;&gt;machie&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;trajectory&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;c1&#34;&gt;# machine_state: 1-working, 0-fail&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;nf&#34;&gt;set_attribute&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;machine_state&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;nf&#34;&gt;timeout&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;function&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;rexp&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;/&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;mttf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;nf&#34;&gt;set_attribute&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;machine_state&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;-1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;mod&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;+&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;nf&#34;&gt;seize&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;repairman&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;nf&#34;&gt;timeout&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;repair_time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;nf&#34;&gt;release&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;repairman&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;nf&#34;&gt;set_attribute&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;machine_state&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;mod&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;+&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;        &lt;span class=&#34;nf&#34;&gt;rollback&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;6&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;plot&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;machine&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div id=&#34;htmlwidget-1&#34; style=&#34;width:672px;height:480px;&#34; class=&#34;grViz html-widget&#34;&gt;&lt;/div&gt;
+&lt;script type=&#34;application/json&#34; data-for=&#34;htmlwidget-1&#34;&gt;{&#34;x&#34;:{&#34;diagram&#34;:&#34;digraph {\n\ngraph [layout = \&#34;dot\&#34;,\n       outputorder = \&#34;edgesfirst\&#34;,\n       bgcolor = \&#34;white\&#34;]\n\nnode [fontname = \&#34;sans-serif\&#34;,\n      fontsize = \&#34;10\&#34;,\n      shape = \&#34;circle\&#34;,\n      fixedsize = \&#34;true\&#34;,\n      width = \&#34;1.5\&#34;,\n      style = \&#34;filled\&#34;,\n      fillcolor = \&#34;aliceblue\&#34;,\n      color = \&#34;gray70\&#34;,\n      fontcolor = \&#34;gray50\&#34;]\n\nedge [fontname = \&#34;Helvetica\&#34;,\n     fontsize = \&#34;8\&#34;,\n     len = \&#34;1.5\&#34;,\n     color = \&#34;gray80\&#34;,\n     arrowsize = \&#34;0.5\&#34;]\n\n  \&#34;1\&#34; [label = \&#34;SetAttribute\&#34;, shape = \&#34;box\&#34;, style = \&#34;solid\&#34;, color = \&#34;black\&#34;, tooltip = \&#34;keys: [machine_state], values: [1], global: 0, mod: N, init: 0\&#34;, fontcolor = \&#34;black\&#34;, fillcolor = \&#34;#000000\&#34;] \n  \&#34;2\&#34; [label = \&#34;Timeout\&#34;, shape = \&#34;box\&#34;, style = \&#34;solid\&#34;, color = \&#34;black\&#34;, tooltip = \&#34;delay: function()\&#34;, fontcolor = \&#34;black\&#34;, fillcolor = \&#34;#000000\&#34;] \n  \&#34;3\&#34; [label = \&#34;SetAttribute\&#34;, shape = \&#34;box\&#34;, style = \&#34;solid\&#34;, color = \&#34;black\&#34;, tooltip = \&#34;keys: [machine_state], values: [-1], global: 0, mod: +, init: 0\&#34;, fontcolor = \&#34;black\&#34;, fillcolor = \&#34;#000000\&#34;] \n  \&#34;4\&#34; [label = \&#34;Seize\&#34;, shape = \&#34;box\&#34;, style = \&#34;filled\&#34;, color = \&#34;#7FC97F\&#34;, tooltip = \&#34;resource: repairman, amount: 1\&#34;, fontcolor = \&#34;black\&#34;, fillcolor = \&#34;#7FC97F\&#34;] \n  \&#34;5\&#34; [label = \&#34;Timeout\&#34;, shape = \&#34;box\&#34;, style = \&#34;solid\&#34;, color = \&#34;black\&#34;, tooltip = \&#34;delay: 1\&#34;, fontcolor = \&#34;black\&#34;, fillcolor = \&#34;#000000\&#34;] \n  \&#34;6\&#34; [label = \&#34;Release\&#34;, shape = \&#34;box\&#34;, style = \&#34;filled\&#34;, color = \&#34;#7FC97F\&#34;, tooltip = \&#34;resource: repairman, amount: 1\&#34;, fontcolor = \&#34;black\&#34;, fillcolor = \&#34;#7FC97F\&#34;] \n  \&#34;7\&#34; [label = \&#34;SetAttribute\&#34;, shape = \&#34;box\&#34;, style = \&#34;solid\&#34;, color = \&#34;black\&#34;, tooltip = \&#34;keys: [machine_state], values: [1], global: 0, mod: +, init: 0\&#34;, fontcolor = \&#34;black\&#34;, fillcolor = \&#34;#000000\&#34;] \n  \&#34;8\&#34; [label = \&#34;Rollback\&#34;, shape = \&#34;diamond\&#34;, style = \&#34;filled\&#34;, color = \&#34;lightgrey\&#34;, tooltip = \&#34;times: -1\&#34;, fontcolor = \&#34;black\&#34;, fillcolor = \&#34;#D3D3D3\&#34;] \n\&#34;1\&#34;-&gt;\&#34;2\&#34; [color = \&#34;black\&#34;, style = \&#34;solid\&#34;] \n\&#34;2\&#34;-&gt;\&#34;3\&#34; [color = \&#34;black\&#34;, style = \&#34;solid\&#34;] \n\&#34;3\&#34;-&gt;\&#34;4\&#34; [color = \&#34;black\&#34;, style = \&#34;solid\&#34;] \n\&#34;4\&#34;-&gt;\&#34;5\&#34; [color = \&#34;black\&#34;, style = \&#34;solid\&#34;] \n\&#34;5\&#34;-&gt;\&#34;6\&#34; [color = \&#34;black\&#34;, style = \&#34;solid\&#34;] \n\&#34;6\&#34;-&gt;\&#34;7\&#34; [color = \&#34;black\&#34;, style = \&#34;solid\&#34;] \n\&#34;7\&#34;-&gt;\&#34;8\&#34; [color = \&#34;black\&#34;, style = \&#34;solid\&#34;] \n\&#34;8\&#34;-&gt;\&#34;2\&#34; [color = \&#34;grey\&#34;, style = \&#34;dashed\&#34;] \n}&#34;,&#34;config&#34;:{&#34;engine&#34;:&#34;dot&#34;,&#34;options&#34;:null}},&#34;evals&#34;:[],&#34;jsHooks&#34;:[]}&lt;/script&gt;
+&lt;p&gt;Make it a function.&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;simmer_relia&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;function&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sim_time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;mon_&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;attributes&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;env&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;simmer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;c1&#34;&gt;# use resource to track system state&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;c1&#34;&gt;# all items in series will require same &amp;#34;repair&amp;#34; resource. &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;c1&#34;&gt;# set capacity to inf, assuming no queue for repair&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;c1&#34;&gt;# if repair resource busy -&amp;gt; system down&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;c1&#34;&gt;# for n-oo-k items, if resource server &amp;gt; k-n -&amp;gt;system down &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nf&#34;&gt;add_resource&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;repairman&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;capacity&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;Inf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nf&#34;&gt;add_generator&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;machine_a&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;machine&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;100&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;at&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;mon&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nf&#34;&gt;add_generator&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;machine_b&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;machine&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;100&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;5&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;at&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;mon&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nf&#34;&gt;run&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;sim_time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;invisible&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nf&#34;&gt;if &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;mon_&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;==&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;resources&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;){&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;sim_log&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;get_mon_resources&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;env&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;else&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;if &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;mon_&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;==&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;attributes&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;sim_log&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;get_mon_attributes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;env&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;sim_log&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;loop-for-replications&#34;&gt;Loop for replications&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;N_RUN&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt;  &lt;span class=&#34;m&#34;&gt;10&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;SIM_END&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;500&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;ptm&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;proc.time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;machine_state_log&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;N_RUN&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nf&#34;&gt;map_df&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;function&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;cbind&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;simmer_relia&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;SIM_END&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;tibble&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i_run&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;x&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;simmer_time&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;proc.time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ptm&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;tail&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;machine_state_log&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;##         time       name           key value replication i_run
+## 209 442.3666 machine_b0 machine_state     0           1    10
+## 210 447.3666 machine_b0 machine_state     1           1    10
+## 211 462.9960 machine_a0 machine_state     0           1    10
+## 212 472.8377 machine_b0 machine_state     0           1    10
+## 213 472.9960 machine_a0 machine_state     1           1    10
+## 214 477.8377 machine_b0 machine_state     1           1    10
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Test&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;simu_attributes&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;simmer_relia&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;500&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;simu_attributes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;##         time       name           key value replication
+## 1    0.00000 machine_a0 machine_state     1           1
+## 2    0.00000 machine_b0 machine_state     1           1
+## 3   42.28105 machine_b0 machine_state     0           1
+## 4   47.28105 machine_b0 machine_state     1           1
+## 5   77.35852 machine_a0 machine_state     0           1
+## 6   87.35852 machine_a0 machine_state     1           1
+## 7   98.15019 machine_b0 machine_state     0           1
+## 8  103.15019 machine_b0 machine_state     1           1
+## 9  111.34813 machine_a0 machine_state     0           1
+## 10 121.34813 machine_a0 machine_state     1           1
+## 11 151.84864 machine_a0 machine_state     0           1
+## 12 161.84864 machine_a0 machine_state     1           1
+## 13 179.71953 machine_b0 machine_state     0           1
+## 14 184.71953 machine_b0 machine_state     1           1
+## 15 236.37764 machine_b0 machine_state     0           1
+## 16 241.37764 machine_b0 machine_state     1           1
+## 17 259.25923 machine_a0 machine_state     0           1
+## 18 269.25923 machine_a0 machine_state     1           1
+## 19 397.68679 machine_a0 machine_state     0           1
+## 20 407.68679 machine_a0 machine_state     1           1
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;simu_resources&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;simmer_relia&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;500&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;mon&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;resources&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;plot&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;simu_resources&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;metric&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;usage&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;repairman&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;items&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;server&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;steps&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;TRUE&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;img src=&#34;/post/discrete-event-simulation-part-ii/index.en_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;
+&lt;h1 id=&#34;monitoring-resources-vs-attributes&#34;&gt;Monitoring: resources vs attributes&lt;/h1&gt;
+&lt;p&gt;With simmer, by adding user-defined attributes, we can log the simualtion flexibly. In the context of the system reliability, since only one “repariman” resource is requested when ANY of the machines fail, the “repairman” resource can be used directly for simple system reliability metrics. If the it is series system, whenever the repairman is busy, the system is down. Or it is n-out-of-k, then &amp;gt;= n simultaneous “repairs” implies system down.&lt;/p&gt;
+&lt;p&gt;The attribute logs the state of all the “machines”, it is more flexible to use the attributes. We are interest in the event sequence of the system down time, the &lt;code&gt;Intervals&lt;/code&gt; pacakge, which provides a collections of operation on intervals over the real number line (R), is helpful the determine the system state base on the component state.&lt;/p&gt;
+&lt;p&gt;In the example above, we have the event sequence of the machine_a and machine_b, so for a parellel system, the intersection of downtime interval is the system down time. and for a series system, union.&lt;/p&gt;
+&lt;h3 id=&#34;convert-event-sequences-to-state-intervals&#34;&gt;Convert event sequences to state intervals&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;machine_state_interval&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;function&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;machine_state_log&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;){&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;machine_state_log&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nf&#34;&gt;group_by&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i_run&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nf&#34;&gt;arrange&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;c1&#34;&gt;# end_time is lead(start_time) (remove leading NA), last one is sim_end&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nf&#34;&gt;mutate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;end_time&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;c&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;head&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;lead&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;-1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;SIM_END&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nf&#34;&gt;ungroup&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;dplyr&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;::&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;select&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;value&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;start_time&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;end_time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i_run&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nf&#34;&gt;arrange&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i_run&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;start_time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;state_interval&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;machine_state_interval&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;machine_state_log&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;machine_down_interval&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;function&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;state_interval&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;machine_name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;){&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;fail_log&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;state_interval&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nf&#34;&gt;filter&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i_run&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;name&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;machine_name&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nf&#34;&gt;filter&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;value&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;==&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nf&#34;&gt;Intervals&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;matrix&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;c&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fail_log&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;$&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;start_time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;fail_log&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;$&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;end_time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ncol&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;parallel---intersection-of-the-interval&#34;&gt;parallel -&amp;gt; intersection of the interval&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;parallel_down_log&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;tibble&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;start_time&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;as.numeric&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;end_time&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;as.numeric&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i_run&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;as.integer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;())&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;for &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;N_RUN&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;){&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;parallel_down_interval&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;interval_intersection&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nf&#34;&gt;machine_down_interval&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;state_interval&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;machine_a0&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nf&#34;&gt;machine_down_interval&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;state_interval&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;machine_b0&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nf&#34;&gt;if&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;length&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;parallel_down_interval&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;){&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nf&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nf&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;parallel_down_interval&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;parallel_down_log&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;rbind&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;parallel_down_log&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                            &lt;span class=&#34;nf&#34;&gt;cbind&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;as.matrix&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;parallel_down_interval&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;tibble&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i_run&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;## [1] 2
+## Object of class Intervals
+## 1 interval over R:
+## [478.915332901574, 483.915332901574]
+## [1] 4
+## Object of class Intervals
+## 3 intervals over R:
+## [127.319955610845, 132.319955610845]
+## [172.881427812846, 173.262362609792]
+## [342.919421858134, 345.583527818413]
+## [1] 8
+## Object of class Intervals
+## 2 intervals over R:
+## [31.0425011441112, 32.3605401348323]
+## [228.437912753763, 232.337844351521]
+## [1] 9
+## Object of class Intervals
+## 3 intervals over R:
+## [218.752050740942, 223.752050740942]
+## [223.757618140727, 225.728760083031]
+## [392.129864142056, 397.129864142056]
+## [1] 10
+## Object of class Intervals
+## 2 intervals over R:
+## [177.240104033592, 178.677071282164]
+## [472.837684197787, 472.99596169469]
+&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;names&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;parallel_down_log&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;c&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;start&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;end&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;i_run&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;parallel_down_log&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;##       start       end i_run
+## 1  478.9153 483.91533     2
+## 2  127.3200 132.31996     4
+## 3  172.8814 173.26236     4
+## 4  342.9194 345.58353     4
+## 5   31.0425  32.36054     8
+## 6  228.4379 232.33784     8
+## 7  218.7521 223.75205     9
+## 8  223.7576 225.72876     9
+## 9  392.1299 397.12986     9
+## 10 177.2401 178.67707    10
+## 11 472.8377 472.99596    10
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;series---union-of-the-interval&#34;&gt;Series -&amp;gt; union of the interval&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;series_down_log&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;tibble&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;start_time&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;as.numeric&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;end_time&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;as.numeric&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(),&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i_run&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;as.integer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;())&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;for &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;in&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;o&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;N_RUN&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;){&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;n&#34;&gt;series_down_interval&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;interval_union&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nf&#34;&gt;machine_down_interval&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;state_interval&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;machine_a0&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;nf&#34;&gt;machine_down_interval&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;state_interval&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;machine_b0&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nf&#34;&gt;if&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;length&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;series_down_interval&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&#34;m&#34;&gt;0&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;){&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;    &lt;span class=&#34;n&#34;&gt;series_down_log&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;rbind&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;series_down_log&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;                             &lt;span class=&#34;nf&#34;&gt;cbind&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nf&#34;&gt;as.matrix&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;series_down_interval&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;),&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;tibble&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;i_run&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;i&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)))&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;names&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;series_down_log&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;c&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s&#34;&gt;&amp;#34;start&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;end&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;i_run&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;head&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;series_down_log&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;20&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;##        start       end i_run
+## 1   16.19063  21.19063     1
+## 2  129.24719 139.24719     1
+## 3  185.54990 195.54990     1
+## 4  238.09241 248.09241     1
+## 5  286.15305 291.15305     1
+## 6  329.35981 339.35981     1
+## 7  394.35776 404.35776     1
+## 8  430.09741 435.09741     1
+## 9  442.58259 447.58259     1
+## 10  24.76090  29.76090     2
+## 11  36.06396  46.06396     2
+## 12 168.25193 178.25193     2
+## 13 297.63221 302.63221     2
+## 14 312.97773 322.97773     2
+## 15 345.40873 355.40873     2
+## 16 413.44466 418.44466     2
+## 17 477.55216 487.55216     2
+## 18 495.97379 500.00000     2
+## 19  30.97991  35.97991     3
+## 20 189.75923 194.75923     3
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Parameterizations of Weibull Distribution</title>
+      <link>/post/parameterizations-of-weibull-distribution/</link>
+      <pubDate>Sat, 23 Jul 2022 00:00:00 +0000</pubDate>
+      <guid>/post/parameterizations-of-weibull-distribution/</guid>
+      <description>
+
+
+&lt;ul&gt;
+&lt;li&gt;Repost&lt;/li&gt;
+&lt;li&gt;The inline latex was not rendered if use &lt;code&gt;.Rmarkdown&lt;/code&gt; extension, but it works when the extension is &lt;code&gt;.Rmd&lt;/code&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div id=&#34;most-widely-used-distribution-in-reliability-engineering&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Most Widely Used Distribution in Reliability Engineering&lt;/h2&gt;
+&lt;p&gt;Weibull distribution is widely used because its flexibility and simplicity. It is the most widely used in the field of reliability engineering. Engineers use Weibull plot to find clues about whether the failure is infant mortality or wearing out, or use the curve shape to determine whether there are more than one underlying failure mechanisms. Actually, there are several software companies selling software packages named after the &lt;a href=&#34;https://en.wikipedia.org/wiki/Waloddi_Weibull&#34;&gt;Swedish Engineer&lt;/a&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;parameterizations&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Parameterizations&lt;/h2&gt;
+&lt;p&gt;When I mentioned the simplicity of Weibull distribution, I was referring to that it has only two paraments, and both of them have significannt engineering interprations.&lt;/p&gt;
+&lt;div id=&#34;shape-and-scale&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Shape and Scale&lt;/h3&gt;
+&lt;p&gt;One of the most popular Reliability Engineering software package is Weibull++ (r) made by Reliasoft. The company also maintains the website [www.weibull.com]. It provides wealth of information of reliability engineering, and especially, Weibull distribution and its applications. In their implentation, the Weibull distribution has a characteristic life parameter &lt;span class=&#34;math inline&#34;&gt;\(\eta\)&lt;/span&gt; and a shape factor &lt;span class=&#34;math inline&#34;&gt;\(\beta\)&lt;/span&gt;, and the hazard function is &lt;span class=&#34;math display&#34;&gt;\[ h \left( t \right) = \frac{\beta} {\eta} \left( \frac{t}{\eta}\right)^\beta\]&lt;/span&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;where &lt;span class=&#34;math inline&#34;&gt;\(\eta\)&lt;/span&gt; is the scale parameter, or characteristic life&lt;/li&gt;
+&lt;li&gt;and &lt;span class=&#34;math inline&#34;&gt;\(\beta\)&lt;/span&gt; is the shape parameter (or slope)
+The reliability function is thus &lt;span class=&#34;math display&#34;&gt;\[ R \left( t \right) = e^ {- \left( \frac{t}{\eta} \right) ^ \beta} \]&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;It is easy to see:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;when &lt;span class=&#34;math inline&#34;&gt;\(\beta = 1\)&lt;/span&gt;, the h(t) is a flat line, a constant;&lt;/li&gt;
+&lt;li&gt;when &lt;span class=&#34;math inline&#34;&gt;\(\beta &amp;gt; 1\)&lt;/span&gt;, the h(t) is monotonously increasing over time;&lt;/li&gt;
+&lt;li&gt;when &lt;span class=&#34;math inline&#34;&gt;\(\beta &amp;lt; 1\)&lt;/span&gt;, the h(t) is monotonously increasing over time;&lt;/li&gt;
+&lt;li&gt;While &lt;span class=&#34;math inline&#34;&gt;\(\beta\)&lt;/span&gt; determines the shaple of curve, the &lt;span class=&#34;math inline&#34;&gt;\(\eta\)&lt;/span&gt; determines the scale.&lt;/li&gt;
+&lt;li&gt;&lt;span class=&#34;math inline&#34;&gt;\(\eta\)&lt;/span&gt; is the time that no matter what &lt;span class=&#34;math inline&#34;&gt;\(\beta\)&lt;/span&gt; is, &lt;span class=&#34;math inline&#34;&gt;\(R \left( t \right) = e^{-1} = 63\%\)&lt;/span&gt;, thus the name charasteristic life.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Through my graduate schools, we used same parameterization in the textbooks ( &lt;a href=&#34;https://www.amazon.com/Applied-Life-Analysis-Wayne-Nelson/dp/0471644625&#34;&gt;Nelson&lt;/a&gt; and &lt;a href=&#34;https://www.amazon.com/Reliability-Engineering-Risk-Analysis-Practical/dp/0849392470&#34;&gt;Modarres&lt;/a&gt;), except that &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; took the place of &lt;span class=&#34;math inline&#34;&gt;\(\eta\)&lt;/span&gt;. Give it a few years, I adjusted.&lt;/p&gt;
+&lt;p&gt;You can hear debate about &lt;span class=&#34;math inline&#34;&gt;\(\beta\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\eta\)&lt;/span&gt; of a component around my office. Engineers love this simplicity.&lt;/p&gt;
+&lt;p&gt;Until there is none.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;confusion&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Confusion&lt;/h2&gt;
+&lt;div id=&#34;most-popular-stastical-software&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Most Popular Stastical Software&lt;/h3&gt;
+&lt;p&gt;There is no denial that the by far most widely used statistical software is Excel, even though a unreliable one.
+Let’s look at the Weibull distribution implemented in &lt;a href=&#34;https://support.office.com/en-us/article/WEIBULL-function-b83dc2c6-260b-4754-bef2-633196f6fdcc&#34;&gt;Excel:&lt;/a&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;WEIBULL(x,alpha,beta,cumulative)&lt;/p&gt;
+&lt;p&gt;The WEIBULL function syntax has the following arguments:&lt;/p&gt;
+&lt;p&gt;X Required. The value at which to evaluate the function.&lt;/p&gt;
+&lt;p&gt;Alpha, Beta Required, parameters to the distribution.&lt;/p&gt;
+&lt;p&gt;Cumulative Required. Determines the form of the function, if True, returns CDP, if false, pdf..&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;The equation for the Weibull cumulative distribution function is:
+&lt;span class=&#34;math display&#34;&gt;\[ F\left( t; \alpha, \beta \right) = 1 - e^ {- \left( \frac{t}{\beta} \right) ^ \alpha}\]&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;Well, it not too bad, just my world upside down. &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; is &lt;span class=&#34;math inline&#34;&gt;\(\beta\)&lt;/span&gt;, and &lt;span class=&#34;math inline&#34;&gt;\(\beta\)&lt;/span&gt; is &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt;.
+In excel, &lt;span class=&#34;math inline&#34;&gt;\(\beta\)&lt;/span&gt; is scale, and &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; is shape.&lt;/p&gt;
+&lt;p&gt;Also, important to note that in Excel function call, only order matters, and you cannot force call by argument as in R.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div id=&#34;the-upstart&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;The Upstart&lt;/h3&gt;
+&lt;p&gt;Welcome to R&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;The Weibull distribution with shape parameter a and scale parameter b has density given by
+f(x) = (a/b) (x/b)^(a-1) exp(- (x/b)^a)
+for x &amp;gt; 0. The cumulative distribution function is F(x) = 1 - exp(- (x/b)^a) on x &amp;gt; 0&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;So, a is shape, or &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt;. And b is scale, or &lt;span class=&#34;math inline&#34;&gt;\(\beta\)&lt;/span&gt;, as in Excel, not Nelson.
+When calling function with argument, as most do in R, it is less confusing.&lt;/p&gt;
+&lt;p&gt;Shape = 1 means constant as in most implementations, and scale is the characteristic life.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;t &amp;lt;- 0:1000
+plot(t, pweibull(t, shape = 1, scale = 500))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/parameterizations-of-weibull-distribution/index.en_files/figure-html/unnamed-chunk-1-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;And &lt;code&gt;python&lt;/code&gt;
+See the doc from &lt;a href=&#34;https://numpy.org/doc/stable/reference/random/generated/numpy.random.weibull.html&#34;&gt;numpy&lt;/a&gt;:&lt;/p&gt;
+&lt;p&gt;The probability density for the Weibull distribution is
+&lt;span class=&#34;math display&#34;&gt;\[p\left(x\right)=\frac{a}{\lambda}\cdot \left(\frac{x}{\lambda}\right)^{a-1}\cdot e^{-\left(x/b\right)^a}\]&lt;/span&gt;
+where &lt;span class=&#34;math inline&#34;&gt;\(a\)&lt;/span&gt; is the shape and &lt;span class=&#34;math inline&#34;&gt;\(\lambda\)&lt;/span&gt; the scale.&lt;/p&gt;
+&lt;p&gt;Same equation as &lt;code&gt;r&lt;/code&gt;, except &lt;span class=&#34;math inline&#34;&gt;\(\lambda\)&lt;/span&gt; is in the place of &lt;span class=&#34;math inline&#34;&gt;\(b\)&lt;/span&gt;.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;jmp&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;JMP&lt;/h2&gt;
+&lt;p&gt;I love JMP. Not the software, I have not used for long enough to form an opinion. I love the &lt;a href=&#34;http://www.jmp.com/support/help/Survival_Platform_Options.shtml#221381&#34;&gt;help&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Various Weibull Parameters in Terms of JMP’s alpha and beta&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr class=&#34;header&#34;&gt;
+&lt;th align=&#34;left&#34;&gt;JMP Weibull&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;alpha&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;beta&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Wayne Nelson&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;alpha=alpha&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;beta=beta&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Meeker and Escobar&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;eta=alpha&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;beta=beta&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Tobias and Trindade&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;c = alpha&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;m = beta&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Kececioglu&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;eta=alpha&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;beta=beta&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Hosmer and Lemeshow&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;exp(X beta)=alpha&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;lambda=beta&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Blishke and Murthy&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;beta=alpha&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;alpha=beta&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Kalbfleisch and Prentice&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;lambda = 1/alpha&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;p = beta&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;even&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;JMP Extreme Value&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;lambda=log(alpha)&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;delta=1/beta&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr class=&#34;odd&#34;&gt;
+&lt;td align=&#34;left&#34;&gt;Meeker and Escobar&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;mu=log(alpha)&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;sigma=1/beta&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;div id=&#34;final-thoughts&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;Final Thoughts&lt;/h2&gt;
+&lt;p&gt;Weibull distribution is used widely in engineering, biostatistics and other areas. The paramenterization has many ways. The most common used in engineering is the convention used in Nelson or Meeker. The shape factor is the characteristic life, called &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; or &lt;span class=&#34;math inline&#34;&gt;\(\eta\)&lt;/span&gt;, and shape factor &lt;span class=&#34;math inline&#34;&gt;\(\beta\)&lt;/span&gt;.
+Even though in R help file, a is used for shape factor, and b for scale, when people call by argument, it is fairly straight forward.&lt;/p&gt;
+&lt;p&gt;However, Excel’s implementation is the poorest. The prompt for the equation gives &lt;span class=&#34;math inline&#34;&gt;\(\alpha\)&lt;/span&gt; and &lt;span class=&#34;math inline&#34;&gt;\(\beta\)&lt;/span&gt; without mention which is shape or sacle factor, while they use it he opposite way as most other software package. To make things worse, the help file only gives equations and not the terminology shape or scale factor. It is not hard to imagine that mistakes embeded in some important spreadsheet that are used to make critical decision. After all, Excel is &lt;em&gt;the most&lt;/em&gt; popular statistical software, especially in business world, which is &lt;em&gt;the&lt;/em&gt; world that matters :)&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
     
     <item>
       <title>Daily Stoic</title>
@@ -39,7 +558,7 @@
     &lt;div class=&#34;w-100&#34; &gt;&lt;img src=&#34;https://i.etsystatic.com/21074444/r/il/5b8350/3431180193/il_1588xN.3431180193_mo4t.jpg&#34; alt=&#34;Stoic Bullion&#34; loading=&#34;lazy&#34; data-zoomable /&gt;&lt;/div&gt;
   &lt;/div&gt;&lt;/figure&gt;
 &lt;/p&gt;
-&lt;p&gt;The fonts on the back is too small to read, but overall the build quality is good. It is creadit card size. I will see how it will help.&lt;/p&gt;
+&lt;p&gt;The fonts on the back is too small to read, but overall the build quality is good. It is creadit card size, and fits in my wallet.&lt;/p&gt;
 &lt;h2 id=&#34;four-virtues&#34;&gt;Four Virtues&lt;/h2&gt;
 &lt;ul&gt;
 &lt;li&gt;Wisdom&lt;/li&gt;
@@ -59,7 +578,7 @@
 &lt;p&gt;Do not act as if you had thousands of years to live. The unavoidable hangs above your head. While you have life in you, while you sill can, make yourself good.  -Marcus Aurelius&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;blockquote&gt;
-&lt;p&gt;Remember death: To say this to tell a person to remember their freedom. -Sensca,&lt;/p&gt;
+&lt;p&gt;Remember death: To say this to tell a person to remember their freedom. -Sensca&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Act as if you have already died and what is left is now a gift. Now go live the rest properly.  - Marcus Aurelius&lt;/p&gt;
@@ -74,28 +593,28 @@
 &lt;blockquote&gt;
 &lt;p&gt;All our human lot should be before our eyes.  -Seneca&lt;/p&gt;
 &lt;/blockquote&gt;
-&lt;h3 id=&#34;amor-fatt&#34;&gt;AMOR FATT&lt;/h3&gt;
+&lt;h3 id=&#34;amor-fati&#34;&gt;AMOR FATI&lt;/h3&gt;
 &lt;blockquote&gt;
-&lt;p&gt;The spirit must Be trainad to a realisation and an acceptance of its lot.  -Seneca&lt;/p&gt;
+&lt;p&gt;The spirit must be trainad to a realisation and an acceptance of its lot.  -Seneca&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;blockquote&gt;
 &lt;p&gt;What fortune has made is not your own.  -Seneca&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;blockquote&gt;
-&lt;p&gt;Remember that you are an actor in a play. For that is your business, to act the role that is assigned to you as well as you can.  - Epicletus.&lt;/p&gt;
+&lt;p&gt;Remember that you are an actor in a play. For that is your business, to act the role that is assigned to you as well as you can.  - Epicletus&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;h3 id=&#34;temet-nosce&#34;&gt;TEMET NOSCE&lt;/h3&gt;
 &lt;blockquote&gt;
 &lt;p&gt;To know thyself is the beginning of wisdom.  -Aristotle&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;blockquote&gt;
-&lt;p&gt;The unexamined life is not worth living.  -Socrates,&lt;/p&gt;
+&lt;p&gt;The unexamined life is not worth living.  -Socrates&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;blockquote&gt;
-&lt;p&gt;To find yourself, think for yeurself.  -Socrates,&lt;/p&gt;
+&lt;p&gt;To find yourself, think for yeurself.  -Socrates&lt;/p&gt;
 &lt;/blockquote&gt;
 &lt;blockquote&gt;
-&lt;p&gt;Dig within. Therein lies the fountain of good.  -Marcus Aurelius.&lt;/p&gt;
+&lt;p&gt;Dig within. Therein lies the fountain of good.  -Marcus Aurelius&lt;/p&gt;
 &lt;/blockquote&gt;
 </description>
     </item>
@@ -109,19 +628,26 @@
 &lt;script src=&#34;/post/discrete-event-simulation/index.en_files/viz/viz.js&#34;&gt;&lt;/script&gt;
 &lt;link href=&#34;/post/discrete-event-simulation/index.en_files/DiagrammeR-styles/styles.css&#34; rel=&#34;stylesheet&#34; /&gt;
 &lt;script src=&#34;/post/discrete-event-simulation/index.en_files/grViz-binding/grViz.js&#34;&gt;&lt;/script&gt;
-&lt;h1 id=&#34;discrete-event-simulation-des-and-reliability-block-diagram-rbd&#34;&gt;Discrete Event Simulation (DES) and Reliability Block Diagram (RBD)&lt;/h1&gt;
-&lt;p&gt;DES is the simulation of stochastic processes with discrete state space, such as the classic M/M/1 queue: exponential interarrival and service times, with a single server. The state space can be defined as the queue length, which is integer-valued and thus “discrete.” This contrasts to, a continuous system, such as simulating a moving object, where state such as location is continuous.&lt;/p&gt;
-&lt;p&gt;System Reliability can be a DES problem, if we only consider discrete state of the components and not the continous parameters. The classic System Reliability theories are discrete state, and most of the time, binary states.&lt;/p&gt;
-&lt;p&gt;A reliability block diagram (RBD) is one of the frequently used tool for modeling system reliability. It use a block diagram method to show how component reliability contributes to the success or failure of a complex system.&lt;/p&gt;
-&lt;p&gt;Commercial Reliability Software packages, such as Reliasoft Blocksim(R), use RBD to model the system and then use analytical or simulation methods to calculate the system reliability metrics.
-The RBD is a graphical interface to build the DES. However, Reliasoft Blocksim limits itself to the binary states. It also lacks the capability to simulate dynamic response to failures (ref Yunwei Hu 2022). A more generic DES is desirable in certain complex systems.&lt;/p&gt;
-&lt;h1 id=&#34;des-in-python-and-r&#34;&gt;DES in Python and R&lt;/h1&gt;
-&lt;p&gt;DES are implemented in commercial software and also as generic framework in Java, Python, etc. SimPy is a process-based discrete-event simulation framework based on standard Python. More recenlty, Simmer is developed as a process-oriented and trajectory-based Discrete-Event Simulation (DES) package for R. It is designed to be a generic framework like SimPy or SimJulia, and it runs the DES with Rcpp to boost the performance and turning DES in R feasible.&lt;/p&gt;
+&lt;h2 id=&#34;discrete-event-simulation-des-and-reliability-block-diagram-rbd&#34;&gt;Discrete Event Simulation (DES) and Reliability Block Diagram (RBD)&lt;/h2&gt;
+&lt;p&gt;Discrete Event Simulation (DES) is the simulation of stochastic processes with discrete state space. An examploe of DES is the classic M/M/1 queue system: exponential interarrival and service times, with a single server. The state space can be defined as the queue length, which is integer-valued and thus “discrete.” This contrasts to, a continuous system, such as simulating a moving object, where state such as location is continuous.&lt;/p&gt;
+&lt;p&gt;When we are dealing with complex system reliability, we have two dimensions:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;the system reliability hierarchy, which is how component reliability impact the overall system performance&lt;/li&gt;
+&lt;li&gt;the dyanmic response to an event, or state change, e.g. component failure, battery drain etc. (ref Yunwei Hu et al. 2022)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;System Reliability can be treated a DES problem, if we only consider discrete state of the components and not the continuous parameters. The classic System Reliability theories treat system state space as discrete, and most of the time, binary states.&lt;/p&gt;
+&lt;p&gt;A reliability block diagram (RBD) is one of the most frequently used tool for modeling system reliability. It use a block diagram method to show how component reliability contributes to the success or failure of a complex system. It is a graphical representation of the boolenan
+logic of the system configuration.&lt;/p&gt;
+&lt;p&gt;Commercial Reliability Software packages, such as Reliasoft Blocksim(R), use Reliability Block Diagram (RBD) to allow users to model the system and then use analytical or simulation methods to calculate the system reliability metrics. Thus, the RBD is used as a graphical interface to build the DES. However, the states are typcially binary, i.e. failure or success. Even though RBD is boolean only, the commercial software has added some dyanmic features, such as phased mission.&lt;/p&gt;
+&lt;p&gt;In a way, we can say RBD tools focus on the first aspect of the system reliability, and the genric DES tools focus on the second.&lt;/p&gt;
+&lt;p&gt;If the problem is about how the system design, such as redundancy, will impact the systme reliaiblity, RBD would be the preferred tool. It the problems involve complex dyanmic event sequences, and/or other non-binany system states, a generic DES might be preferred.&lt;/p&gt;
+&lt;h2 id=&#34;des-in-python-and-r&#34;&gt;DES in Python and R&lt;/h2&gt;
+&lt;p&gt;DES are implemented in commercial software and also as generic framework in Java, Python, etc. SimPy is a process-based discrete-event simulation framework implemented in Python. More recenlty, Simmer is developed as a process-oriented and trajectory-based Discrete-Event Simulation (DES) package for R. It is designed to be a generic framework like SimPy or SimJulia, and it runs the DES with Rcpp to boost the performance and turning DES in R feasible.&lt;/p&gt;
 &lt;p&gt;This post aims at evaluating Simpy and Simmer in the context of System Reliability.&lt;/p&gt;
-&lt;h1 id=&#34;simpy--reticulate&#34;&gt;Simpy + Reticulate&lt;/h1&gt;
-&lt;p&gt;Reticulate package offers a set of tools for interoperability between Python and R. In this example, we use Reticulate to import a Simpy Model, and pass the simulation result to R as a data frame.&lt;/p&gt;
-&lt;h2 id=&#34;machie-shop-example&#34;&gt;Machie Shop Example&lt;/h2&gt;
-&lt;h3 id=&#34;prepare-the-python&#34;&gt;Prepare the python&lt;/h3&gt;
+&lt;h2 id=&#34;simpy--reticulate&#34;&gt;Simpy + Reticulate&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;Reticulate&lt;/code&gt; package offers a set of tools for interoperability between Python and R. In this example, we use Reticulate to import a Simpy Model, and pass the simulation result to R as a data frame.&lt;/p&gt;
+&lt;h3 id=&#34;machie-shop-example&#34;&gt;Machie Shop Example&lt;/h3&gt;
+&lt;h4 id=&#34;prepare-the-python&#34;&gt;Prepare the python&lt;/h4&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;library&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;tidyverse&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;library&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;reticulate&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# use_python(&amp;#34;/Users/myhome/anaconda/bin/python&amp;#34;)&lt;/span&gt;
@@ -188,24 +714,24 @@ class Machine:
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;map_time&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;proc.time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ptm&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;map_time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;##    user  system elapsed 
-##  14.802   0.099  14.906
+##  14.887   0.142  15.048
 &lt;/code&gt;&lt;/pre&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;head&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;ev&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;##             event      time n_run
-## 1 Machine_1 fails  12.34682     1
-## 2 Machine_1 fixed  14.34682     1
-## 3 Machine_2 fails 128.06360     1
-## 4 Machine_2 fixed 130.06360     1
-## 5 Machine_1 fails 286.76827     1
-## 6 Machine_1 fixed 288.76827     1
+## 1 Machine_1 fails  59.32455     1
+## 2 Machine_1 fixed  61.32455     1
+## 3 Machine_2 fails  90.35233     1
+## 4 Machine_2 fixed  92.35233     1
+## 5 Machine_1 fails 165.67622     1
+## 6 Machine_1 fixed 167.67622     1
 &lt;/code&gt;&lt;/pre&gt;
-&lt;h1 id=&#34;r-simmer&#34;&gt;R-simmer&lt;/h1&gt;
+&lt;h2 id=&#34;r-simmer&#34;&gt;R-simmer&lt;/h2&gt;
 &lt;p&gt;R-simmer has similar implentation as Simpy, but with Simmer, everything is monitored automatically, and reported in handy data frames. This works especially well when doing many replications.&lt;/p&gt;
-&lt;h2 id=&#34;prepare-enviroment&#34;&gt;Prepare enviroment&lt;/h2&gt;
+&lt;h3 id=&#34;prepare-enviroment&#34;&gt;Prepare enviroment&lt;/h3&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;library&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;tidyverse&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;library&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;simmer&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;library&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;simmer.plot&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h2 id=&#34;define-machine&#34;&gt;Define Machine&lt;/h2&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;h3 id=&#34;define-machine&#34;&gt;Define Machine&lt;/h3&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;machine&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;function&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;mttf&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;repair_time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;print_log&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;TRUE&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;){&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;nf&#34;&gt;if &lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;print_log&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;      &lt;span class=&#34;n&#34;&gt;machie&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;trajectory&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;%&amp;gt;%&lt;/span&gt; 
@@ -250,8 +776,10 @@ class Machine:
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Plot the repair_log&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# n_fail &amp;lt;- get_mon_attributes(env)&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;repair_log&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;simmer_relia&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;100&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
-&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;## 95.4579: machine_b0: fail
-## 96.4579: machine_b0: fixed
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;## 12.1535: machine_b0: fail
+## 13.1535: machine_b0: fixed
+## 38.7201: machine_b0: fail
+## 39.7201: machine_b0: fixed
 &lt;/code&gt;&lt;/pre&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;plot&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;repair_log&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;metric&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;usage&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;repairman&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;items&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;s&#34;&gt;&amp;#34;server&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;steps&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;kc&#34;&gt;TRUE&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;img src=&#34;/post/discrete-event-simulation/index.en_files/figure-html/unnamed-chunk-6-1.png&#34; width=&#34;672&#34; /&gt;
@@ -269,8 +797,8 @@ class Machine:
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;## # A tibble: 2 × 2
 ##   sys_state duration
 ##       &amp;lt;dbl&amp;gt;    &amp;lt;dbl&amp;gt;
-## 1         0        1
-## 2         1        0
+## 1         0      2  
+## 2         1     25.6
 &lt;/code&gt;&lt;/pre&gt;
 &lt;h3 id=&#34;loop&#34;&gt;loop&lt;/h3&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;ptm&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;proc.time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt;
@@ -279,27 +807,67 @@ class Machine:
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;n&#34;&gt;simmer_time&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&#34;nf&#34;&gt;proc.time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;()&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;-&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;ptm&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;print&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;simmer_time&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;##    user  system elapsed 
-##  12.705   0.142  12.856
+##  12.782   0.188  13.011
 &lt;/code&gt;&lt;/pre&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-r&#34; data-lang=&#34;r&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nf&#34;&gt;tail&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;n&#34;&gt;repair_log&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;pre&gt;&lt;code&gt;##          resource     time server queue capacity queue_size system limit
-## 1597107 repairman 40106.13      1     0      Inf        Inf      1   Inf
-## 1597108 repairman 40107.13      0     0      Inf        Inf      0   Inf
-## 1597109 repairman 40133.22      1     0      Inf        Inf      1   Inf
-## 1597110 repairman 40134.22      0     0      Inf        Inf      0   Inf
-## 1597111 repairman 40175.45      1     0      Inf        Inf      1   Inf
-## 1597112 repairman 40176.45      0     0      Inf        Inf      0   Inf
+## 1595807 repairman 40271.97      1     0      Inf        Inf      1   Inf
+## 1595808 repairman 40272.97      0     0      Inf        Inf      0   Inf
+## 1595809 repairman 40280.60      1     0      Inf        Inf      1   Inf
+## 1595810 repairman 40281.60      0     0      Inf        Inf      0   Inf
+## 1595811 repairman 40307.81      1     0      Inf        Inf      1   Inf
+## 1595812 repairman 40308.81      0     0      Inf        Inf      0   Inf
 ##         replication n_run
-## 1597107           1  1000
-## 1597108           1  1000
-## 1597109           1  1000
-## 1597110           1  1000
-## 1597111           1  1000
-## 1597112           1  1000
+## 1595807           1  1000
+## 1595808           1  1000
+## 1595809           1  1000
+## 1595810           1  1000
+## 1595811           1  1000
+## 1595812           1  1000
 &lt;/code&gt;&lt;/pre&gt;
-&lt;h1 id=&#34;reference&#34;&gt;Reference&lt;/h1&gt;
-&lt;p&gt;Yunwei Hu, Tarannom Parhizkar, Ali Mosleh (2022). Guided simulation for dynamic probabilistic risk assessment of complex systems: Concept, method, and application. In &lt;em&gt;Reliability Engineering &amp;amp; System Safety&lt;/em&gt;, January 2022
-Modarres, Mohammad; Mark Kaminskiy; Vasiliy Krivtsov (1999). Reliability Engineering and Risk Analysis. Ney York, NY: Marcel Decker, Inc. p. 198. ISBN 0-8247-2000-8.&lt;/p&gt;
+&lt;h2 id=&#34;appendix-types-of-simulation&#34;&gt;Appendix: Types of Simulation&lt;/h2&gt;
+&lt;p&gt;A good summary on this topic can be found at &lt;a href=&#34;https://bookdown.org/manuele_leonelli/SimBook/types-of-simulations.html&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Simulation and Modelling to Understand Change by &lt;em&gt;Manuele Leonelli&lt;/em&gt;&lt;/a&gt;
+Without quoting the whole chapter, I will only highlight the key elements:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Stochastic vs. deterministic&lt;/li&gt;
+&lt;li&gt;Static vs. Dynamic&lt;/li&gt;
+&lt;li&gt;(Among dynamic simulations) Discrete vs. Continuous&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;mermaid&#34;&gt;graph TD;
+    Simulation--&gt; Stochastic;
+    Simulation--&gt; Deterministic;
+    Stochastic--&gt; Dynamic;
+    Stochastic--&gt; Static;
+    Dynamic--&gt; Discrete;
+    Dynamic--&gt; Continuous;
+&lt;/div&gt;
+&lt;h2 id=&#34;reference&#34;&gt;Reference&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;Yunwei Hu, Tarannom Parhizkar, Ali Mosleh (2022). Guided simulation for dynamic probabilistic risk assessment of complex systems: Concept, method, and application. In &lt;em&gt;Reliability Engineering &amp;amp; System Safety&lt;/em&gt;, January 2022&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Modarres, Mohammad; Mark Kaminskiy; Vasiliy Krivtsov (1999). Reliability Engineering and Risk Analysis. Ney York, NY: Marcel Decker, Inc. p. 198. ISBN 0-8247-2000-8.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Use python via reticulate on Macbook M1</title>
+      <link>/post/use-python-via-reticulate-on-macbook-m1/</link>
+      <pubDate>Fri, 22 Jul 2022 00:00:00 +0000</pubDate>
+      <guid>/post/use-python-via-reticulate-on-macbook-m1/</guid>
+      <description>&lt;p&gt;I stopped updating this blog since 2020 serveral months into the pandemic. When I checked again this week, quite a few things were broken, &lt;code&gt;hugo&lt;/code&gt;, &lt;code&gt;shiny&lt;/code&gt; and &lt;code&gt;latex&lt;/code&gt;, just to name a few.&lt;/p&gt;
+&lt;p&gt;I am in the process to repost the old posts, and found that as of today, July 2022, &lt;code&gt;reticulate&lt;/code&gt; is imcompatible with the &lt;code&gt;Anacodna&lt;/code&gt; distro, even though Anacodna has a M1 distro since May, 2022.&lt;/p&gt;
+&lt;p&gt;The workaround is&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;uninstall &lt;code&gt;anaconda&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;use &lt;code&gt;reticulate::install_miniconda&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;Install packages to the &lt;code&gt;env&lt;/code&gt; of your choice&lt;/li&gt;
+&lt;li&gt;then &lt;code&gt;reticulate::use_miniconda(env)&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;It is fairly straightforward. Hopefully reticulate will be compatible with &lt;code&gt;Anaconda&lt;/code&gt; in future updates.&lt;/p&gt;
 </description>
     </item>
     
