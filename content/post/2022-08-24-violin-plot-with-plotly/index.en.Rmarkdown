@@ -1,0 +1,67 @@
+---
+title: Violin Plot with Plotly
+author: YUNWEI HU
+date: '2022-08-24'
+slug: violin-plot-with-plotly
+categories:
+  - visualization
+tags:
+  - rstats
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2022-08-24T22:49:42-07:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+# Violin Plot
+[Violin Plot](https://en.wikipedia.org/wiki/Violin_plot) is a powerful tool for exploratory data analysis, and I prefer it to [boxplot](https://blog.bioturing.com/2018/05/16/5-reasons-you-should-use-a-violin-graph/).
+
+In `ggplot2`, the violin plots can be horizontal or vertical by assign the factors to either x or y axis:
+### Vertial Violin Plot
+
+```{r}
+library(plotly)
+library(ggplot2)
+
+pv <- ggplot(mtcars, aes(factor(cyl), mpg)) +
+       geom_violin(fill = NA, 
+                   draw_quantiles = c(0.25, 0.5, 0.75))
+pv
+```
+### Horizontal 
+```{r}
+ph <- ggplot(mtcars, aes(x = mpg, y = factor(cyl))) +
+       geom_violin(fill = NA, 
+                   draw_quantiles = c(0.25, 0.5, 0.75))
+ph
+```
+We easily create the interactive plotly chart by `ggplotly`:
+```{r}
+plotly::ggplotly(pv)
+```
+And horizontal
+```{r}
+ggplotly(ph)
+```
+
+Huh ...
+Not only that, the quantile lines disappeared too, which was [reported back in 2018](https://github.com/plotly/plotly.R/issues/1400).
+
+ The workaround is to use `coord_flip`.
+ 
+```{r}
+ ggplotly(pv + coord_flip())
+```
+ 
+ The `coord_flip` was discussed in the [`plotly` official website](https://plotly.com/ggplot2/violin/). 
+ >With geom_violin(), the y-axis must always be the continuous variable, and the x-axis the categorical variable. To create horizontal violin graphs, keep the x- and y-variables as is and add coord_flip().
+ 
+I do not think the paragraph quoted above accurately described the situation. The `geom_violin` in `ggplot2` can take categorical data in either x or y axis. The `ggplotly` does not render correcly when `y` is categorical. The `coord_flip` does the job of flipping, so no big deal. However the quantile lines rendering is a bug that worth fixing. 
+ 
+ 
+ 
